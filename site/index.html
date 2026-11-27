@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pippa · Read the books before you knock on doors</title>
+    <meta name="description" content="Pippa reads an organisation's asset registers, budgets and funders' own materials. It finds idle capacity, says plainly which funders are worth your time, and shows how to pitch what you already have." />
+    <meta property="og:title" content="Pippa: read the books before you knock on doors" />
+    <meta property="og:description" content="An AI advisor for resource mobilisation. It finds what organisations already have, then the partners worth their time." />
+    <meta name="theme-color" content="#14231F" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%232F5D50'/><text x='16' y='22.5' font-size='19' text-anchor='middle' fill='%23F2D35B' font-family='Georgia' font-weight='700'>P</text></svg>" />
+    <link rel="preload" href="fonts/bricolage.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="fonts/source-serif.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+
+    <header class="nav">
+      <a class="brand" href="#top" aria-label="Pippa home">
+        <span class="brand-mark" aria-hidden="true">P</span>
+        <span class="brand-name">Pippa</span>
+      </a>
+      <nav aria-label="Main">
+        <a href="#how">How it works</a>
+        <a href="#results">What you get</a>
+        <a href="#team">Team</a>
+        <a class="nav-signin" href="https://pippa.maahigupta.workers.dev/">Sign in</a>
+      </nav>
+    </header>
+
+    <main id="main">
+      <!-- Hero: the live register -->
+      <section class="hero" id="top">
+        <div class="hero-copy">
+          <h1>Read the books before you knock on doors.</h1>
+          <p class="hero-sub">
+            Pippa reads your asset registers, budgets and funders’ own materials. It finds the capacity you’ve stopped seeing, tells you
+            plainly which funders are worth your time, and shows you how to pitch what you already have.
+          </p>
+          <div class="hero-ctas">
+            <a class="btn btn-primary" href="mailto:maahigupta@gmail.com?subject=Pippa%20access">Request access</a>
+            <a class="btn btn-ghost" href="#how">See how it works</a>
+          </div>
+        </div>
+
+        <figure class="register" aria-label="Pippa reading an asset register">
+          <div class="register-head">
+            <span class="register-title">Asset register</span>
+            <span class="register-status" aria-live="polite"><span class="pulse" aria-hidden="true"></span><span id="reg-status">Reading line 1 of 9</span></span>
+          </div>
+          <div class="register-cols" aria-hidden="true">
+            <span>Item</span><span>Recorded use</span><span class="num">Book value</span>
+          </div>
+          <ol class="register-rows" id="reg-rows"></ol>
+          <div class="register-tray">
+            <div class="tray-head">
+              <span>Found</span>
+              <span class="tray-total" id="reg-total">USD 0 a year</span>
+            </div>
+            <ul class="tray-items" id="reg-tray"></ul>
+          </div>
+          <figcaption class="register-note">Illustrative register. Pippa cites the line behind every finding.</figcaption>
+        </figure>
+      </section>
+
+      <!-- Why now -->
+      <section class="why">
+        <p class="why-line">
+          Official development aid fell by roughly <strong>$50 billion</strong> in 2025, a drop of 23% in a single year. Philanthropy can’t
+          replace it, and the funders who remain want partners who bring something to the table.
+        </p>
+        <p class="source">Source: OECD preliminary figures, reported by Fortune, 2026.</p>
+      </section>
+
+      <!-- How it works: a real sequence -->
+      <section class="how" id="how">
+        <h2>Three steps, in the order good fundraisers already work.</h2>
+        <ol class="steps">
+          <li>
+            <span class="step-n" aria-hidden="true">1</span>
+            <h3>Frame the case</h3>
+            <p>The problem, the mission, who’s involved and why your approach works. Set it once; Pippa reads it before every analysis.</p>
+          </li>
+          <li>
+            <span class="step-n" aria-hidden="true">2</span>
+            <h3>Look inward</h3>
+            <p>Upload an asset register, budget or programme report. Pippa finds idle buildings, equipment, staff time and money, and flags what must not be touched.</p>
+          </li>
+          <li>
+            <span class="step-n" aria-hidden="true">3</span>
+            <h3>Look outward</h3>
+            <p>Add a funder’s own materials. Pippa checks eligibility, scores the fit, names the best route in, and says what you can offer them.</p>
+          </li>
+        </ol>
+      </section>
+
+      <!-- What you get: annotated excerpt -->
+      <section class="results" id="results">
+        <div class="results-intro">
+          <h2>A verdict you can act on, in plain language.</h2>
+          <p>
+            No twenty-page report. Pippa returns a short brief: a clear verdict, the reasons, what to bring, what to watch out for, and one next
+            step with an owner. Then you can ask it questions about the result.
+          </p>
+        </div>
+
+        <div class="excerpt">
+          <article class="mock mock-verdict" aria-label="Example funder check result">
+            <p class="mock-kicker">Funder check, Harbourline Foundation</p>
+            <p class="mock-verdict-word">Pursue narrowly</p>
+            <p class="mock-text">Strong fit for youth skills through your idle workshop. Not for the classroom block: they don’t fund buildings.</p>
+            <div class="mock-scores">
+              <div><span>Material fit</span><b>71</b><i style="--w: 71%"></i></div>
+              <div><span>Symbolic fit</span><b>78</b><i style="--w: 78%"></i></div>
+              <div><span>Drift risk</span><b>24</b><i class="low" style="--w: 24%"></i></div>
+            </div>
+            <div class="mock-checks">
+              <span class="ok">Geography</span><span class="ok">Accounts</span><span class="no">Construction</span><span class="q">Co-funding</span>
+            </div>
+          </article>
+
+          <article class="mock mock-opp" aria-label="Example internal resource finding">
+            <p class="mock-kicker">Internal resources</p>
+            <h3>Train teachers in the hall you already own</h3>
+            <p class="mock-text">The 120-seat hall is used two days a month. Hosting training there saves about USD 12,000 per school.</p>
+            <p class="mock-src">From your register: B-002, multipurpose hall</p>
+            <div class="mock-pills"><span class="g">Risk: low</span><span class="g">Effort: low</span><span class="g">Confidence: high</span></div>
+          </article>
+
+          <ul class="callouts">
+            <li><b>Every claim has a source.</b> Findings point to the line, row or page they came from. Missing facts are listed as missing.</li>
+            <li><b>Verdicts come on a fixed scale.</b> Pursue, Pursue narrowly, Hold or Don’t pursue, with confidence and what would change it.</li>
+            <li><b>It knows what to leave alone.</b> Donor-restricted assets and anything near children are flagged, never offered up.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Principles -->
+      <section class="principles">
+        <h2>Built to be trusted with real organisations.</h2>
+        <dl class="principle-list">
+          <div>
+            <dt>Works only from what you give it</dt>
+            <dd>Pippa doesn’t browse or guess. If a fact isn’t in your documents or answers, it says so.</dd>
+          </div>
+          <div>
+            <dt>Asks before it answers</dt>
+            <dd>Two to four sharp questions about the gaps that would change the verdict. You can skip them.</dd>
+          </div>
+          <div>
+            <dt>Keeps your material private</dt>
+            <dd>Uploaded files aren’t stored, and nothing you share is used to train AI models.</dd>
+          </div>
+        </dl>
+      </section>
+
+      <!-- Origin + team -->
+      <section class="team" id="team">
+        <div class="team-intro">
+          <h2>Born in a classroom of people who raise money for a living.</h2>
+          <p>
+            Pippa grew out of a course on resource mobilisation for senior leaders of a global child-welfare network: national directors with
+            decades of fundraising behind them. It runs the method they practised by hand, faster, and on their own documents.
+          </p>
+        </div>
+        <div class="people">
+          <article class="person">
+            <img src="img/maahi.jpg" alt="Maahi Gupta" width="480" height="480" loading="lazy" />
+            <div>
+              <h3>Maahi Gupta</h3>
+              <p class="person-role">Design and build</p>
+              <p>Designed and built Pippa. M.S. in Transnational Security, NYU Center for Global Affairs.</p>
+              <p class="person-links">
+                <a href="mailto:maahigupta@gmail.com">maahigupta@gmail.com</a>
+                <a href="https://www.linkedin.com/in/maahi-gupta-708b2221b/" target="_blank" rel="noreferrer">LinkedIn</a>
+              </p>
+            </div>
+          </article>
+          <article class="person">
+            <img src="img/andras.jpg" alt="Andras Vamos-Goldman" width="480" height="480" loading="lazy" />
+            <div>
+              <h3>Andras Vamos-Goldman</h3>
+              <p class="person-role">Concept and method</p>
+              <p>Canadian diplomat, international lawyer and social entrepreneur. Conceived Pippa and the method behind it.</p>
+              <p class="person-links">
+                <a href="mailto:andrasvg@gmail.com">andrasvg@gmail.com</a>
+                <a href="https://www.linkedin.com/in/andras-vamos-goldman-72563a31/" target="_blank" rel="noreferrer">LinkedIn</a>
+              </p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- CTA -->
+      <section class="cta">
+        <h2>Bring Pippa to your organisation.</h2>
+        <p>We’re working with a small number of organisations and partners. Tell us what you raise money for, and we’ll be in touch.</p>
+        <div class="hero-ctas">
+          <a class="btn btn-signal" href="mailto:maahigupta@gmail.com?subject=Pippa%20access">Request access</a>
+          <a class="btn btn-ghost-dark" href="https://pippa.maahigupta.workers.dev/">Sign in</a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="foot">
+      <span class="brand-mark small" aria-hidden="true">P</span>
+      <p>Pippa. Read the books before you knock on doors.</p>
+      <p class="foot-meta">Pippa uses AI. Results are a first read; check facts before acting. © 2026 Pippa</p>
+    </footer>
+
+    <script src="main.js" defer></script>
+  </body>
+</html>
