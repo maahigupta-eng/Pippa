@@ -53,33 +53,67 @@ async function takeQuota(env: Env, email: string): Promise<boolean> {
 
 // ---------- Anthropic ----------
 
+type ContentBlock = { type: string; name?: string; input?: unknown; text?: string };
+type Message = { role: "user" | "assistant"; content: unknown };
+
+/** Pull a JSON object out of a text reply, in case the model answers in text instead of a tool call. */
+function jsonFromText(text: string): Record<string, unknown> | null {
+  const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+  const candidate = fenced ? fenced[1] : text.slice(text.indexOf("{"), text.lastIndexOf("}") + 1);
+  try {
+    const parsed = JSON.parse(candidate);
+    return parsed && typeof parsed === "object" ? (parsed as Record<string, unknown>) : null;
+  } catch {
+    return null;
+  }
+}
+
 async function callClaude(env: Env, tool: Tool, phase: "clarify" | "analyze", req: AnalyzeRequest, kase: CaseRecord | null) {
   const schema = phase === "clarify" ? CLARIFY_TOOL : tool === "funder" ? FUNDER_TOOL : RESOURCES_TOOL;
-  const res = await fetch(env.ANTHROPIC_URL || "https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      "x-api-key": env.ANTHROPIC_API_KEY,
-      "anthropic-version": "2023-06-01",
-    },
-    body: JSON.stringify({
-      model: env.MODEL,
-      max_tokens: phase === "clarify" ? 1200 : 6000,
-      system: systemPrompt(tool),
-      tools: [schema],
-      tool_choice: { type: "tool", name: schema.name },
-      messages: [{ role: "user", content: userContent(req, kase, phase) }],
-    }),
-  });
-  if (!res.ok) {
-    const detail = await res.text();
-    console.error("Anthropic error", res.status, detail.slice(0, 1000));
-    throw new Error(explainAnthropicError(res.status, detail, env.MODEL));
+  // Some models reject a forced tool_choice, so we offer the tool, require it in the instructions,
+  // and accept either a tool call or a JSON reply. If neither comes back, we ask once more.
+  const system = `${systemPrompt(tool)}\n\n---\n\nOUTPUT RULE: Respond only by calling the "${schema.name}" tool with your full answer. Do not write anything outside the tool call.`;
+  const messages: Message[] = [{ role: "user", content: userContent(req, kase, phase) }];
+
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const res = await fetch(env.ANTHROPIC_URL || "https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-api-key": env.ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
+      },
+      body: JSON.stringify({
+        model: env.MODEL,
+        max_tokens: phase === "clarify" ? 4000 : 16000,
+        system,
+        tools: [schema],
+        tool_choice: { type: "auto" },
+        messages,
+      }),
+    });
+    if (!res.ok) {
+      const detail = await res.text();
+      console.error("Anthropic error", res.status, detail.slice(0, 1000));
+      throw new Error(explainAnthropicError(res.status, detail, env.MODEL));
+    }
+    const body = (await res.json()) as { content: ContentBlock[]; stop_reason?: string };
+    const call = body.content.find((c) => c.type === "tool_use" && c.name === schema.name);
+    if (call?.input && typeof call.input === "object") return call.input as Record<string, unknown>;
+
+    const text = body.content.filter((c) => c.type === "text").map((c) => c.text ?? "").join("\n");
+    const parsed = jsonFromText(text);
+    if (parsed) return parsed;
+
+    console.warn("No tool call on attempt", attempt + 1, "stop_reason:", body.stop_reason, text.slice(0, 300));
+    if (body.stop_reason === "max_tokens") throw new Error("Pippa's answer was cut off because the documents are long. Try fewer pages.");
+    // Retry with the same request plus an explicit reminder at the end.
+    messages[0] = {
+      role: "user",
+      content: [...userContent(req, kase, phase), { type: "text", text: `Reminder: answer only by calling the "${schema.name}" tool.` }],
+    };
   }
-  const body = (await res.json()) as { content: { type: string; name?: string; input?: unknown }[] };
-  const call = body.content.find((c) => c.type === "tool_use");
-  if (!call?.input) throw new Error("Pippa returned an empty answer. Try again.");
-  return call.input as Record<string, unknown>;
+  throw new Error("Pippa couldn't produce a structured answer. Try again, or shorten the documents.");
 }
 
 /** Turn an Anthropic API error into a message that says what to fix. */

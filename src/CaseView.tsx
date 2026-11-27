@@ -45,7 +45,7 @@ export default function CaseView({ cases, onSaved }: { cases: CaseRecord[]; onSa
       const { id } = await api.saveCase({ id: current === "new" ? undefined : current, title, profile, challenge });
       onSaved();
       setCurrent(id);
-      setStatus("Saved. The Internal Resource Finder and Funder Check can now use this case.");
+      setStatus("Saved. Next: step 2, internal resources.");
     } catch (e) {
       setStatus((e as Error).message);
     }
@@ -53,10 +53,11 @@ export default function CaseView({ cases, onSaved }: { cases: CaseRecord[]; onSa
 
   return (
     <section>
-      <h1>The Classroom</h1>
+      <p className="eyebrow">Step 1</p>
+      <h1>Your case</h1>
       <p className="lead">
-        Your group's case from the course: the four steps from Module 1. Come back here whenever you want to rethink the problem. The
-        Internal Resource Finder and Funder Check can draw on a case from here, or run without one.
+        Your group's case from the course: the four steps from Module 1. Everything after builds on it. Come back here whenever you want to
+        rethink the problem.
       </p>
 
       {cases.length > 0 && (

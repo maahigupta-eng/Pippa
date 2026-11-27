@@ -20,7 +20,7 @@ type View =
 
 function readHash(): View {
   const h = location.hash.replace(/^#\/?/, "");
-  if (h === "classroom" || h === "case") return { name: "classroom" };
+  if (h === "case" || h === "classroom") return { name: "classroom" };
   if (h === "funder") return { name: "tool", tool: "funder" };
   if (h === "resources") return { name: "tool", tool: "resources" };
   if (h === "saved") return { name: "saved" };
@@ -65,11 +65,14 @@ export default function App() {
     refreshCases();
   }, [refreshCases]);
 
-  const nav: [string, string, boolean][] = [
-    ["resources", "Internal Resource Finder", view.name === "tool" && view.tool === "resources"],
-    ["funder", "Funder Check", view.name === "tool" && view.tool === "funder"],
+  // The three steps of the method, in order; then the reference pages.
+  const steps: [string, string, string, boolean][] = [
+    ["case", "1", "Your case", view.name === "classroom"],
+    ["resources", "2", "Internal resources", view.name === "tool" && view.tool === "resources"],
+    ["funder", "3", "Funder check", view.name === "tool" && view.tool === "funder"],
+  ];
+  const more: [string, string, boolean][] = [
     ["saved", "Saved", view.name === "saved" || view.name === "run"],
-    ["classroom", "The Classroom", view.name === "classroom"],
     ["about", "About", view.name === "about"],
   ];
 
@@ -83,7 +86,18 @@ export default function App() {
           <span className="mark">P</span> Pippa
         </a>
         <nav>
-          {nav.map(([path, label, active]) => (
+          <ol className="stepnav">
+            {steps.map(([path, num, label, active]) => (
+              <li key={path}>
+                <a href={`#/${path}`} className={active ? "active" : ""}>
+                  <span className="stepnum">{num}</span>
+                  {label}
+                </a>
+              </li>
+            ))}
+          </ol>
+          <span className="navsep" aria-hidden="true" />
+          {more.map(([path, label, active]) => (
             <a key={path} href={`#/${path}`} className={active ? "active" : ""}>
               {label}
             </a>
@@ -131,29 +145,24 @@ function Home({ hasCase }: { hasCase: boolean }) {
 
       <ol className="steps">
         <li>
-          <strong>Look inward.</strong> Give the Internal Resource Finder an asset register, budget or programme report. It finds idle or
-          underused capacity, each item traced to a line in your document.
+          <strong>Your case.</strong> The four steps from Module 1: problem, mission, stakeholders, value proposition. Set it up once and come
+          back whenever you want to rethink the problem. Everything after builds on it.
         </li>
         <li>
-          <strong>Look outward.</strong> Give Funder Check a funder's own materials. It scores the fit, checks eligibility, names the best
-          route in, and says what SOS can offer them.
+          <strong>Internal resources.</strong> Give Pippa an asset register, budget or programme report. It finds idle or underused capacity,
+          each item traced to a line in your document.
         </li>
         <li>
-          <strong>Go back to the Classroom</strong> when you want to rethink the problem. Your case from the course lives there, and the
-          tools can draw on it.
+          <strong>Funder check.</strong> Give Pippa a funder's own materials. It scores the fit, checks eligibility, names the best route in,
+          and says what SOS can offer them.
         </li>
       </ol>
 
       <div className="cta-row">
-        <button className="primary" onClick={() => go("resources")}>
-          Start with the Internal Resource Finder
+        <button className="primary" onClick={() => go(hasCase ? "resources" : "case")}>
+          {hasCase ? "Continue to step 2: internal resources" : "Start with step 1: your case"}
         </button>
-        <button onClick={() => go("funder")}>Check a funder</button>
-        {!hasCase && (
-          <button className="link" onClick={() => go("classroom")}>
-            Add your course case
-          </button>
-        )}
+        {hasCase && <button onClick={() => go("case")}>Revisit your case</button>}
       </div>
 
       <div className="notice">

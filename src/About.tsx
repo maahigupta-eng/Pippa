@@ -21,7 +21,7 @@ export default function About() {
       <h2>How it works</h2>
       <ol>
         <li>
-          <strong>The Classroom</strong> holds your case from the course: the problem, the mission, the stakeholders, the value proposition.
+          <strong>Your case</strong> holds the four steps from the course: the problem, the mission, the stakeholders, the value proposition.
         </li>
         <li>
           <strong>The Internal Resource Finder</strong> reads your own records for idle or underused capacity that could fund the work or

@@ -129,6 +129,7 @@ export default function ToolFlow({ tool, cases }: { tool: Tool; cases: CaseRecor
 
   return (
     <section>
+      <p className="eyebrow">{tool === "resources" ? "Step 2" : "Step 3"}</p>
       <h1>{copy.title}</h1>
       <p className="lead">{copy.lead}</p>
       {error && <div className="notice error">{error}</div>}
@@ -137,7 +138,7 @@ export default function ToolFlow({ tool, cases }: { tool: Tool; cases: CaseRecor
         <fieldset disabled={step === "asking"}>
           {cases.length > 0 ? (
             <label className="field inline">
-              <span>Case from the Classroom</span>
+              <span>Your case</span>
               <select value={effectiveCase ?? "none"} onChange={(e) => setCaseId(e.target.value)}>
                 {cases.map((c) => (
                   <option key={c.id} value={c.id}>
@@ -149,7 +150,7 @@ export default function ToolFlow({ tool, cases }: { tool: Tool; cases: CaseRecor
             </label>
           ) : (
             <div className="notice">
-              No case yet. Pippa works without one, but the read is sharper with it. <a href="#/classroom">Add your course case in the Classroom</a>.
+              No case yet. Pippa works without one, but the read is much sharper with it. <a href="#/case">Start with step 1: your case</a>.
             </div>
           )}
 

@@ -164,3 +164,12 @@ footer p { margin: 6px 0; }
 .modal li { margin: 0.4em 0; }
 .check { display: flex; gap: 10px; align-items: flex-start; margin: 18px 0; }
 .check input { width: auto; margin-top: 4px; }
+
+/* Step navigation */
+.top nav { align-items: center; }
+.stepnav { display: flex; gap: 22px; list-style: none; margin: 0; padding: 0; }
+.stepnav a { display: inline-flex; align-items: center; gap: 8px; }
+.stepnum { width: 20px; height: 20px; border-radius: 50%; border: 1px solid var(--line); display: inline-grid; place-items: center; font-size: 0.72rem; font-weight: 600; color: var(--muted); }
+.stepnav a.active .stepnum { background: var(--accent); border-color: var(--accent); color: #fff; }
+.navsep { width: 1px; height: 18px; background: var(--line); margin: 0 4px; }
+@media (max-width: 720px) { .stepnav { gap: 14px; } .navsep { display: none; } }

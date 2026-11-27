@@ -38,7 +38,7 @@ export function Privacy() {
           <strong>Your email address</strong>, used to sign you in.
         </li>
         <li>
-          <strong>What you type into Pippa:</strong> your case in the Classroom, what you need, and your answers to Pippa's questions.
+          <strong>What you type into Pippa:</strong> your case, what you need, and your answers to Pippa's questions.
         </li>
         <li>
           <strong>Pippa's results</strong>, saved so you can come back to them.
