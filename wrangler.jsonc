@@ -26,10 +26,10 @@
     "MODEL": "claude-sonnet-5-5",
     "DAILY_RUN_LIMIT": "15",
     // From Cloudflare Zero Trust: your team domain and the Access app's AUD tag.
-    "ACCESS_TEAM_DOMAIN": "https://YOUR-TEAM.cloudflareaccess.com",
-    "ACCESS_AUD": "REPLACE_WITH_ACCESS_AUD",
+    "ACCESS_TEAM_DOMAIN": "https://restless-thunder-4a00.cloudflareaccess.com",
+    "ACCESS_AUD": "b230821a0b8d67ff75ac5b91b2b8b0b3d16151457864d951404964ce0c81992e",
     // Comma-separated admin emails (can see usage).
-    "ADMIN_EMAILS": ""
+    "ADMIN_EMAILS": "maahigupta@gmail.com"
   }
   // Secret, set with: npx wrangler secret put ANTHROPIC_API_KEY
 }
