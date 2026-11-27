@@ -131,6 +131,7 @@ export default function App() {
           <a href="#/terms">Terms of Use</a>
           <a href="#/about">About</a>
           <a href="#/contact">Contact</a>
+          <a href="https://pippa-site.maahigupta.workers.dev/">Pippa website</a>
         </nav>
         <p>Pippa uses AI. Check results before you act on them. Don't upload files that name children, families or staff.</p>
         <p>© 2026 Pippa</p>
