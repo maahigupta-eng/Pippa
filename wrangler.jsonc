@@ -19,7 +19,7 @@
       "binding": "DB",
       "database_name": "pippa-db",
       // Paste the id printed by `npx wrangler d1 create pippa-db`.
-      "database_id": "REPLACE_WITH_YOUR_D1_ID"
+      "database_id": "97756ee5-504b-4dd0-b5b4-46969cd38a49"
     }
   ],
   "vars": {
