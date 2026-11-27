@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { AnalyzeRequest, Answer, CaseRecord, ClarifyResult, FileRole, FunderResult, Need, ResourcesResult, Tool, UploadedFile } from "../shared/types";
 import { api } from "./api";
 import AutoText from "./AutoText";
+import { normalizeClarify } from "../shared/normalize";
 import Thinking from "./Thinking";
 import { ACCEPT, MAX_TOTAL_MB, readFile, totalSizeMB } from "./files";
 import { FunderCard, ResourcesCard } from "./Results";
@@ -79,7 +80,7 @@ export default function ToolFlow({ tool, cases }: { tool: Tool; cases: CaseRecor
     setError(null);
     setStep("asking");
     try {
-      const c = await api.clarify(request());
+      const c = normalizeClarify(await api.clarify(request()));
       setClarify(c);
       if (c.questions.length === 0) return run([]);
       setStep("questions");

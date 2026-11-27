@@ -1,5 +1,6 @@
 import { createRemoteJWKSet, jwtVerify } from "jose";
 import type { AnalyzeRequest, CaseRecord, Tool } from "../shared/types";
+import { normalizeClarify, normalizeFunder, normalizeResources } from "../shared/normalize";
 import { CLARIFY_TOOL, FUNDER_TOOL, RESOURCES_TOOL, systemPrompt, userContent } from "./prompts";
 
 export interface Env {
@@ -267,14 +268,15 @@ async function handleApi(req: Request, env: Env, url: URL): Promise<Response> {
 
     const kase = await loadCase(env, email, body.caseId);
     try {
-      const out = await callClaude(env, body.tool, phase, body, kase);
-      if (phase === "clarify") return json(out);
+      const raw = await callClaude(env, body.tool, phase, body, kase);
+      if (phase === "clarify") return json(normalizeClarify(raw));
+      const out = body.tool === "funder" ? normalizeFunder(raw) : normalizeResources(raw);
 
       const id = crypto.randomUUID();
       const title =
         body.tool === "funder"
-          ? `Funder Check: ${(out.funder_name as string) || "funder"}`
-          : `Internal Resource Finder: ${(out.document_type as string) || "document"}`;
+          ? `Funder Check: ${"funder_name" in out ? out.funder_name : "funder"}`
+          : `Internal Resource Finder: ${"document_type" in out ? out.document_type : "document"}`;
       await env.DB.prepare("INSERT INTO runs (id, email, case_id, tool, title, need, output) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)")
         .bind(id, email, kase?.id ?? null, body.tool, title, JSON.stringify({ need: body.need, answers: body.answers ?? [] }), JSON.stringify(out))
         .run();

@@ -7,6 +7,7 @@ import About from "./About";
 import { ConsentGate, Privacy, Terms } from "./Legal";
 import { FunderCard, ResourcesCard } from "./Results";
 import { SITE } from "./config";
+import ErrorBoundary from "./ErrorBoundary";
 
 type View =
   | { name: "home" }
@@ -107,6 +108,7 @@ export default function App() {
       </header>
 
       <main>
+        <ErrorBoundary resetKey={location.hash}>
         {authError && <div className="notice error">{authError}</div>}
         {view.name === "home" && <Home hasCase={cases.length > 0} />}
         {view.name === "classroom" && <CaseView cases={cases} onSaved={refreshCases} />}
@@ -116,6 +118,7 @@ export default function App() {
         {view.name === "about" && <About />}
         {view.name === "privacy" && <Privacy />}
         {view.name === "terms" && <Terms />}
+        </ErrorBoundary>
       </main>
 
       <footer className="no-print">

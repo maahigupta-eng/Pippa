@@ -1,5 +1,6 @@
 import type { FunderResult, Level, ResourcesResult } from "../shared/types";
 import { FunderLegend, ResourcesLegend } from "./Legend";
+import { normalizeFunder, normalizeResources } from "../shared/normalize";
 
 const VERDICT_CLASS: Record<string, string> = {
   Pursue: "good",
@@ -26,7 +27,7 @@ function Score({ label, value, invert }: { label: string; value: number; invert?
 
 const Pill = ({ level, invert }: { level: Level; invert?: boolean }) => {
   const map = invert ? { low: "good", medium: "ok", high: "bad" } : { low: "bad", medium: "ok", high: "good" };
-  return <span className={`pill ${map[level]}`}>{level}</span>;
+  return <span className={`pill ${map[level] ?? "ok"}`}>{level}</span>;
 };
 
 function List({ title, items }: { title: string; items?: string[] }) {
@@ -48,6 +49,7 @@ const AiNote = () => (
 );
 
 function NextStep({ s }: { s: { action: string; owner: string; within: string } }) {
+  if (!s.action) return <AiNote />;
   return (
     <>
     <div className="next">
@@ -64,7 +66,8 @@ function NextStep({ s }: { s: { action: string; owner: string; within: string } 
   );
 }
 
-export function FunderCard({ r }: { r: FunderResult }) {
+export function FunderCard({ r: raw }: { r: FunderResult }) {
+  const r = normalizeFunder(raw);
   return (
     <article className="result">
       <p className="eyebrow">Funder Check</p>
@@ -74,7 +77,7 @@ export function FunderCard({ r }: { r: FunderResult }) {
         <span className="muted">Confidence: {r.confidence}</span>
       </div>
       <p className="summary">{r.summary}</p>
-      <p className="muted small">Would change if: {r.would_change_if}</p>
+      {r.would_change_if && <p className="muted small">Would change if: {r.would_change_if}</p>}
       <FunderLegend />
 
       <div className="grid3">
@@ -132,7 +135,8 @@ export function FunderCard({ r }: { r: FunderResult }) {
   );
 }
 
-export function ResourcesCard({ r }: { r: ResourcesResult }) {
+export function ResourcesCard({ r: raw }: { r: ResourcesResult }) {
+  const r = normalizeResources(raw);
   return (
     <article className="result">
       <p className="eyebrow">Internal Resource Finder</p>
