@@ -189,3 +189,16 @@ footer p { margin: 6px 0; }
 .thinking-steps li.now::before { border-color: var(--accent); animation: pulse 1.2s ease-in-out infinite; }
 @keyframes pulse { 50% { background: var(--accent-soft); } }
 @media (prefers-reduced-motion: reduce) { .spinner, .thinking-steps li.now::before { animation: none; } }
+
+/* Ratings legend */
+.legend { margin: 18px 0 8px; border: 1px solid var(--line); border-radius: 8px; padding: 10px 16px; background: var(--paper); }
+.legend summary { cursor: pointer; font-weight: 600; color: var(--accent); }
+.legend[open] summary { margin-bottom: 10px; }
+.legend h4 { font-family: var(--serif); margin: 16px 0 6px; }
+.legend-table td { font-size: 0.86rem; }
+.legend-table th .pill { text-transform: none; }
+.legend-types { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px 20px; margin: 0; }
+.legend-types dt { font-weight: 600; font-size: 0.9rem; }
+.legend-types dd { margin: 2px 0 0; font-size: 0.86rem; color: var(--muted); }
+.result h1 { font-size: 1.6rem; }
+.legend-table td .pill { margin-bottom: 4px; }

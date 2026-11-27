@@ -1,4 +1,5 @@
 import type { FunderResult, Level, ResourcesResult } from "../shared/types";
+import { FunderLegend, ResourcesLegend } from "./Legend";
 
 const VERDICT_CLASS: Record<string, string> = {
   Pursue: "good",
@@ -74,6 +75,7 @@ export function FunderCard({ r }: { r: FunderResult }) {
       </div>
       <p className="summary">{r.summary}</p>
       <p className="muted small">Would change if: {r.would_change_if}</p>
+      <FunderLegend />
 
       <div className="grid3">
         <div>
@@ -137,6 +139,7 @@ export function ResourcesCard({ r }: { r: ResourcesResult }) {
       <h1>{r.document_type}</h1>
       <p className="muted">{r.document_summary}</p>
       <p className="summary">{r.headline}</p>
+      <ResourcesLegend />
 
       {r.opportunities.length > 0 && (
         <div className="block">

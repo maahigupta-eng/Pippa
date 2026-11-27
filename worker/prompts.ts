@@ -134,7 +134,7 @@ export const FUNDER_TOOL = {
   input_schema: {
     type: "object",
     properties: {
-      funder_name: str("Funder name as it appears in the materials"),
+      funder_name: str("Funder name only, as in the materials"),
       verdict: { type: "string", enum: ["Pursue", "Pursue narrowly", "Hold", "Don't pursue"] },
       confidence: level("Confidence in the verdict"),
       would_change_if: str("The one fact that would change the verdict"),
@@ -175,7 +175,7 @@ export const RESOURCES_TOOL = {
   input_schema: {
     type: "object",
     properties: {
-      document_type: str("What the document is"),
+      document_type: str("Short title, at most 8 words, e.g. 'Fixed asset register, Kumasi and Site B'"),
       document_summary: str("One or two lines: period, size, totals if computable"),
       headline: str("One or two sentences, outcome first. Say plainly if there is no strong opportunity."),
       opportunities: {
@@ -186,11 +186,11 @@ export const RESOURCES_TOOL = {
           properties: {
             title: str("Short name"),
             source: str("Where in the document: sheet, row, line item, page"),
-            type: { type: "string", enum: ["human", "material", "project", "saving"] },
+            type: { type: "string", enum: ["human", "material", "project", "saving"], description: "Per the Rating definitions in the playbook. Selling or leasing an asset is material." },
             how: str("How it would generate money, save money, or meet the need"),
-            mission_risk: level("Risk to SOS's mission or safeguarding"),
-            effort: level("Effort to set up"),
-            confidence: level("Confidence given the evidence"),
+            mission_risk: level("Per the Rating definitions: risk to children, families, core programmes or donor restrictions"),
+            effort: level("Per the Rating definitions: time, cost and level of approval needed"),
+            confidence: level("Per the Rating definitions: how directly the documents and answers support it"),
             approval: str("Who at SOS would need to approve"),
           },
           required: ["title", "source", "type", "how", "mission_risk", "effort", "confidence", "approval"],

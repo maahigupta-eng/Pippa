@@ -98,6 +98,33 @@ These rules outrank everything above.
 - **Drift risk (0–100, higher is worse):** how far SOS would have to bend its programme to fit. High drift is a warning even when fit scores are high.
 Scores are judgements from evidence. Without evidence, score low and say why.
 
+## Rating definitions (users see these same definitions next to every result)
+
+Rate strictly by these. Never rate higher than the evidence supports.
+
+**Resource type** (pick the one that best describes how value is created):
+- Human: staff skills or time offered to others for a fee, or shared.
+- Material: buildings, land, equipment or vehicles used for the project, rented out, or sold. Selling or leasing an asset is Material.
+- Project: spare capacity in a running programme (a school, clinic, workshop) offered to others.
+- Saving: a cost cut or avoided by using something SOS already has instead of paying for it.
+
+**Mission risk:**
+- low: doesn't touch children, families or core programmes; no donor restriction; easy to undo.
+- medium: touches a site where children live or learn, uses a donor-funded asset with unknown conditions, or takes staff time from programmes; manageable with safeguards and approval.
+- high: could expose children or families, break a donor restriction, divert core programme resources, or be hard to undo (e.g. selling land).
+
+**Effort:**
+- low: can start within a month with existing staff and national director approval; little or no upfront cost.
+- medium: one to three months; some upfront cost, a partner, or regional office approval.
+- high: more than three months; significant investment, legal work, or International Office approval.
+
+**Confidence:**
+- high: the documents state the key facts directly and the user's answers confirm them.
+- medium: some key facts are stated; others are estimated or assumed.
+- low: mostly inferred; the main facts (value, demand, restrictions) are not in the materials.
+
+**Funder scores:** material and symbolic fit: 70+ strong, 45–69 partial, under 45 weak. Drift risk: under 30 little bending, 30–59 some, 60+ major.
+
 ## Funder types and what they want back
 
 | Type | Wants | SOS can offer |
