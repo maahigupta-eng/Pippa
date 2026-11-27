@@ -1,0 +1,198 @@
+import type { FunderResult, Level, ResourcesResult } from "../shared/types";
+
+const VERDICT_CLASS: Record<string, string> = {
+  Pursue: "good",
+  "Pursue narrowly": "ok",
+  Hold: "warn",
+  "Don't pursue": "bad",
+};
+
+function Score({ label, value, invert }: { label: string; value: number; invert?: boolean }) {
+  const good = invert ? 100 - value : value;
+  const cls = good >= 70 ? "good" : good >= 45 ? "ok" : "bad";
+  return (
+    <div className="score">
+      <div className="score-head">
+        <span>{label}</span>
+        <strong>{value}</strong>
+      </div>
+      <div className="bar">
+        <div className={`fill ${cls}`} style={{ width: `${Math.max(2, Math.min(100, value))}%` }} />
+      </div>
+    </div>
+  );
+}
+
+const Pill = ({ level, invert }: { level: Level; invert?: boolean }) => {
+  const map = invert ? { low: "good", medium: "ok", high: "bad" } : { low: "bad", medium: "ok", high: "good" };
+  return <span className={`pill ${map[level]}`}>{level}</span>;
+};
+
+function List({ title, items }: { title: string; items?: string[] }) {
+  if (!items?.length) return null;
+  return (
+    <div className="block">
+      <h3>{title}</h3>
+      <ul>
+        {items.map((x, i) => (
+          <li key={i}>{x}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function NextStep({ s }: { s: { action: string; owner: string; within: string } }) {
+  return (
+    <div className="next">
+      <h3>Next step</h3>
+      <p>
+        <strong>{s.action}</strong>
+      </p>
+      <p className="muted">
+        {s.owner} · within {s.within}
+      </p>
+    </div>
+  );
+}
+
+export function FunderCard({ r }: { r: FunderResult }) {
+  return (
+    <article className="result">
+      <p className="eyebrow">Funder Check</p>
+      <h1>{r.funder_name}</h1>
+      <div className={`verdict ${VERDICT_CLASS[r.verdict] ?? ""}`}>
+        <span className="verdict-word">{r.verdict}</span>
+        <span className="muted">Confidence: {r.confidence}</span>
+      </div>
+      <p className="summary">{r.summary}</p>
+      <p className="muted small">Would change if: {r.would_change_if}</p>
+
+      <div className="grid3">
+        <div>
+          <Score label="Material fit" value={r.scores.material.score} />
+          <p className="small">{r.scores.material.reason}</p>
+        </div>
+        <div>
+          <Score label="Symbolic fit" value={r.scores.symbolic.score} />
+          <p className="small">{r.scores.symbolic.reason}</p>
+        </div>
+        <div>
+          <Score label="Drift risk" value={r.scores.drift.score} invert />
+          <p className="small">{r.scores.drift.reason}</p>
+        </div>
+      </div>
+
+      <div className="block">
+        <h3>Hard checks</h3>
+        <table>
+          <tbody>
+            {r.hard_checks.map((c, i) => (
+              <tr key={i}>
+                <td className="nowrap">{c.check}</td>
+                <td>
+                  <span className={`pill ${c.status === "pass" ? "good" : c.status === "fail" ? "bad" : "ok"}`}>{c.status}</span>
+                </td>
+                <td>{c.note}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="block">
+        <h3>Best route in</h3>
+        <p>
+          <strong>{r.route_in.route}.</strong> {r.route_in.why}
+        </p>
+      </div>
+
+      <List title="What this funder gets from SOS" items={r.what_funder_gets} />
+      <List title="How to frame the ask" items={r.positioning} />
+      <List title="Internal resources to offer as co-financing" items={r.internal_leverage} />
+      <List title="Questions they will ask you" items={r.questions_they_will_ask} />
+      <List title="Not established by the materials" items={r.unverified} />
+      {r.systems_change && (
+        <div className="block">
+          <h3>Systems-change angle</h3>
+          <p>{r.systems_change}</p>
+        </div>
+      )}
+      <NextStep s={r.next_step} />
+    </article>
+  );
+}
+
+export function ResourcesCard({ r }: { r: ResourcesResult }) {
+  return (
+    <article className="result">
+      <p className="eyebrow">Resource Finder</p>
+      <h1>{r.document_type}</h1>
+      <p className="muted">{r.document_summary}</p>
+      <p className="summary">{r.headline}</p>
+
+      {r.opportunities.length > 0 && (
+        <div className="block">
+          <h3>Opportunities</h3>
+          <div className="opps">
+            {r.opportunities.map((o, i) => (
+              <div className="opp" key={i}>
+                <div className="opp-head">
+                  <strong>{o.title}</strong>
+                  <span className="tag">{o.type}</span>
+                </div>
+                <p>{o.how}</p>
+                <div className="opp-meta">
+                  <span>
+                    Mission risk <Pill level={o.mission_risk} invert />
+                  </span>
+                  <span>
+                    Effort <Pill level={o.effort} invert />
+                  </span>
+                  <span>
+                    Confidence <Pill level={o.confidence} />
+                  </span>
+                </div>
+                <p className="small muted">
+                  Source: {o.source} · Approval: {o.approval}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {r.top.length > 0 && (
+        <div className="block">
+          <h3>The strongest {r.top.length === 1 ? "one" : r.top.length}, worked through</h3>
+          <div className="canvas-grid">
+            {r.top.map((t, i) => (
+              <div className="canvas" key={i}>
+                <h4>{t.title}</h4>
+                <dl>
+                  <dt>Asset</dt>
+                  <dd>{t.asset}</dd>
+                  <dt>Model</dt>
+                  <dd>{t.model}</dd>
+                  <dt>Who pays or benefits</dt>
+                  <dd>{t.who_pays}</dd>
+                  <dt>Impact</dt>
+                  <dd>{t.impact}</dd>
+                  <dt>First step</dt>
+                  <dd>{t.first_step}</dd>
+                  <dt>Approves</dt>
+                  <dd>{t.approver}</dd>
+                </dl>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <List title="Use as co-financing or collateral with funders" items={r.leverage} />
+      <List title="Cautions" items={r.cautions} />
+      <List title="Not established by the document" items={r.unverified} />
+      <NextStep s={r.next_step} />
+    </article>
+  );
+}

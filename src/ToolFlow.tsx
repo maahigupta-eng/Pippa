@@ -1,0 +1,263 @@
+import { useState } from "react";
+import type { AnalyzeRequest, Answer, CaseRecord, ClarifyResult, FileRole, FunderResult, Need, ResourcesResult, Tool, UploadedFile } from "../shared/types";
+import { api } from "./api";
+import { ACCEPT, MAX_TOTAL_MB, readFile, totalSizeMB } from "./files";
+import { FunderCard, ResourcesCard } from "./Results";
+
+const FORMS = ["Grant", "In-kind", "Corporate partnership", "Loan", "Recoverable grant", "Investment", "Matching funds"];
+
+const COPY: Record<Tool, { title: string; lead: string; needHint: string; slots: { role: FileRole; label: string; hint: string[] }[] }> = {
+  resources: {
+    title: "Resource Finder",
+    lead: "Find what you already have. Pippa reads your own records for idle or underused capacity that could fund the work, cut the external ask, or count as co-financing.",
+    needHint: "What you're trying to fund or launch, and what would solve it: cash, space, equipment, staff time, a revenue stream.",
+    slots: [
+      {
+        role: "internal",
+        label: "Your internal documents",
+        hint: ["Asset registers (buildings, vehicles, equipment, land)", "Budgets with line items", "Programme reports (activities, capacity, reach)", "Raw exports are fine. Remove names of children, families and staff first."],
+      },
+    ],
+  },
+  funder: {
+    title: "Funder Check",
+    lead: "Is this funder worth your time? Pippa scores the fit against what you need, checks eligibility, names the best route in, and says what SOS can offer them.",
+    needHint: "What you're raising for (a programme, a gap, a specific cost) and roughly how much.",
+    slots: [
+      {
+        role: "funder",
+        label: "The funder's materials",
+        hint: ["Mission and focus areas", "Past grantees: the best signal of what they really fund", "Geographies, grant sizes, eligibility, deadlines", "Annual reports, calls for proposals, US 990 filings"],
+      },
+      {
+        role: "org",
+        label: "Extra material on your side (optional)",
+        hint: ["Anything your case doesn't cover: a concept note, a programme summary, results data"],
+      },
+    ],
+  },
+};
+
+type Step = "input" | "asking" | "questions" | "running" | "result";
+
+export default function ToolFlow({ tool, cases }: { tool: Tool; cases: CaseRecord[] }) {
+  const copy = COPY[tool];
+  const [caseId, setCaseId] = useState<string>(cases[0]?.id ?? "");
+  const [need, setNeed] = useState<Need>({ purpose: "", amount: "", forms: [], notes: "" });
+  const [files, setFiles] = useState<UploadedFile[]>([]);
+  const [pasted, setPasted] = useState<Partial<Record<FileRole, string>>>({});
+  const [clarify, setClarify] = useState<ClarifyResult | null>(null);
+  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [result, setResult] = useState<{ id: string; output: FunderResult | ResourcesResult } | null>(null);
+  const [step, setStep] = useState<Step>("input");
+  const [error, setError] = useState<string | null>(null);
+  const [reading, setReading] = useState(false);
+
+  const effectiveCase = caseId || cases[0]?.id || undefined;
+
+  const request = (withAnswers?: Answer[]): AnalyzeRequest => ({ tool, caseId: effectiveCase, need, files, pasted, answers: withAnswers });
+
+  async function addFiles(list: FileList | null, role: FileRole) {
+    if (!list?.length) return;
+    setError(null);
+    setReading(true);
+    try {
+      const next = [...files];
+      for (const f of Array.from(list)) next.push(await readFile(f, role));
+      if (totalSizeMB(next) > MAX_TOTAL_MB) throw new Error(`Total upload is over ${MAX_TOTAL_MB} MB. Remove a file or paste key sections.`);
+      setFiles(next);
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setReading(false);
+    }
+  }
+
+  async function start() {
+    setError(null);
+    setStep("asking");
+    try {
+      const c = await api.clarify(request());
+      setClarify(c);
+      if (c.questions.length === 0) return run([]);
+      setStep("questions");
+    } catch (e) {
+      setError((e as Error).message);
+      setStep("input");
+    }
+  }
+
+  async function run(ans: Answer[]) {
+    setError(null);
+    setStep("running");
+    try {
+      const r = await api.analyze(request(ans));
+      setResult(r);
+      setStep("result");
+      window.scrollTo(0, 0);
+    } catch (e) {
+      setError((e as Error).message);
+      setStep(clarify?.questions.length ? "questions" : "input");
+    }
+  }
+
+  const hasMaterial = files.length > 0 || Object.values(pasted).some((t) => (t || "").trim());
+  const canStart = need.purpose.trim() && hasMaterial && !reading;
+
+  if (step === "result" && result) {
+    return (
+      <section>
+        <div className="cta-row no-print">
+          <button onClick={() => window.print()}>Print or save as PDF</button>
+          <button
+            onClick={() => {
+              setResult(null);
+              setClarify(null);
+              setAnswers({});
+              setStep("input");
+            }}
+          >
+            Run another
+          </button>
+          <a href="#/saved">Saved analyses</a>
+        </div>
+        {tool === "funder" ? <FunderCard r={result.output as FunderResult} /> : <ResourcesCard r={result.output as ResourcesResult} />}
+      </section>
+    );
+  }
+
+  return (
+    <section>
+      <h1>{copy.title}</h1>
+      <p className="lead">{copy.lead}</p>
+      {error && <div className="notice error">{error}</div>}
+
+      {step === "input" || step === "asking" ? (
+        <fieldset disabled={step === "asking"}>
+          {cases.length > 0 ? (
+            <label className="field inline">
+              <span>Case</span>
+              <select value={effectiveCase} onChange={(e) => setCaseId(e.target.value)}>
+                {cases.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.title}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : (
+            <div className="notice">
+              No case set up yet. Pippa works without one, but the read is sharper with it. <a href="#/case">Set up your case</a>.
+            </div>
+          )}
+
+          <h2>What do you need right now?</h2>
+          <label className="field">
+            <span>Purpose</span>
+            <textarea rows={3} value={need.purpose} placeholder={copy.needHint} onChange={(e) => setNeed({ ...need, purpose: e.target.value })} />
+          </label>
+          <label className="field">
+            <span>Amount or range</span>
+            <input value={need.amount} placeholder="e.g. €80,000 covers one site; €200,000 covers all four" onChange={(e) => setNeed({ ...need, amount: e.target.value })} />
+          </label>
+          <div className="field">
+            <span>Support you can accept</span>
+            <div className="chips">
+              {FORMS.map((f) => (
+                <label key={f} className={`chip ${need.forms.includes(f) ? "on" : ""}`}>
+                  <input
+                    type="checkbox"
+                    checked={need.forms.includes(f)}
+                    onChange={(e) => setNeed({ ...need, forms: e.target.checked ? [...need.forms, f] : need.forms.filter((x) => x !== f) })}
+                  />
+                  {f}
+                </label>
+              ))}
+            </div>
+          </div>
+          <label className="field">
+            <span>Anything else Pippa should know (optional)</span>
+            <input value={need.notes} placeholder="Constraints, timeline, what's off the table" onChange={(e) => setNeed({ ...need, notes: e.target.value })} />
+          </label>
+
+          {copy.slots.map((slot) => (
+            <div key={slot.role}>
+              <h2>{slot.label}</h2>
+              <ul className="hint">
+                {slot.hint.map((h) => (
+                  <li key={h}>{h}</li>
+                ))}
+              </ul>
+              <label className="drop">
+                <input type="file" multiple accept={ACCEPT} onChange={(e) => addFiles(e.target.files, slot.role)} />
+                <span>{reading ? "Reading…" : "Choose files: PDF, Word, Excel, CSV, text or photos of pages"}</span>
+              </label>
+              <ul className="filelist">
+                {files
+                  .map((f, i) => ({ f, i }))
+                  .filter(({ f }) => f.role === slot.role)
+                  .map(({ f, i }) => (
+                    <li key={i}>
+                      {f.name}
+                      <button className="link" onClick={() => setFiles(files.filter((_, j) => j !== i))}>
+                        Remove
+                      </button>
+                    </li>
+                  ))}
+              </ul>
+              <label className="field">
+                <span>Or paste text</span>
+                <textarea rows={4} value={pasted[slot.role] ?? ""} onChange={(e) => setPasted({ ...pasted, [slot.role]: e.target.value })} />
+              </label>
+            </div>
+          ))}
+
+          <div className="cta-row">
+            <button className="primary" onClick={start} disabled={!canStart}>
+              {step === "asking" ? "Pippa is reading…" : "Continue"}
+            </button>
+            {!need.purpose.trim() && <span className="muted">Say what you need first.</span>}
+          </div>
+        </fieldset>
+      ) : null}
+
+      {(step === "questions" || step === "running") && clarify && (
+        <div>
+          <h2>What Pippa sees</h2>
+          <ul className="hint">
+            {clarify.doc_check.map((d) => (
+              <li key={d.name}>
+                <strong>{d.name}:</strong> {d.looks_like}
+              </li>
+            ))}
+          </ul>
+          {clarify.safeguarding_flag && <div className="notice error">{clarify.safeguarding_flag}</div>}
+
+          <h2>A few questions first</h2>
+          <fieldset disabled={step === "running"}>
+            {clarify.questions.map((q) => (
+              <label className="field" key={q.id}>
+                <span>{q.question}</span>
+                <small className="muted">{q.why}</small>
+                <textarea rows={2} value={answers[q.id] ?? ""} onChange={(e) => setAnswers({ ...answers, [q.id]: e.target.value })} />
+              </label>
+            ))}
+            <div className="cta-row">
+              <button className="primary" onClick={() => run(clarify.questions.map((q) => ({ id: q.id, question: q.question, answer: answers[q.id] ?? "" })))}>
+                {step === "running" ? "Pippa is working… (up to a minute)" : "Run the analysis"}
+              </button>
+              <button className="link" onClick={() => run([])}>
+                Skip questions
+              </button>
+              <button className="link" onClick={() => setStep("input")}>
+                Back
+              </button>
+            </div>
+          </fieldset>
+        </div>
+      )}
+
+      {step === "running" && !clarify && <p className="muted">Pippa is working… (up to a minute)</p>}
+    </section>
+  );
+}

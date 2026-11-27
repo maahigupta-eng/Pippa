@@ -1,0 +1,35 @@
+{
+  // One Worker serves both the built site (dist/) and the API (/api/*).
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "pippa",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"]
+  },
+  // The playbook is bundled into the Worker as plain text.
+  "rules": [{ "type": "Text", "globs": ["**/*.md"], "fallthrough": true }],
+  // Turn off the public *.workers.dev address so the only way in is the
+  // Access-protected custom domain. Re-enable only for testing.
+  "workers_dev": false,
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "pippa-db",
+      // Paste the id printed by `npx wrangler d1 create pippa-db`.
+      "database_id": "REPLACE_WITH_YOUR_D1_ID"
+    }
+  ],
+  "vars": {
+    "MODEL": "claude-sonnet-5-5",
+    "DAILY_RUN_LIMIT": "15",
+    // From Cloudflare Zero Trust: your team domain and the Access app's AUD tag.
+    "ACCESS_TEAM_DOMAIN": "https://YOUR-TEAM.cloudflareaccess.com",
+    "ACCESS_AUD": "REPLACE_WITH_ACCESS_AUD",
+    // Comma-separated admin emails (can see usage).
+    "ADMIN_EMAILS": ""
+  }
+  // Secret, set with: npx wrangler secret put ANTHROPIC_API_KEY
+}
