@@ -1,0 +1,7 @@
+// Public marketing site. Static files only, no Worker code, no login.
+{
+  "name": "pippa-site",
+  "compatibility_date": "2026-11-01",
+  "assets": { "directory": "." },
+  "workers_dev": true
+}
