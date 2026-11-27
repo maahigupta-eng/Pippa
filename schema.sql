@@ -39,3 +39,12 @@ CREATE TABLE IF NOT EXISTS usage (
   calls  INTEGER NOT NULL DEFAULT 0,
   PRIMARY KEY (email, day)
 );
+
+-- Record of each user accepting the Terms and Privacy Notice (per version).
+-- The Worker also creates all tables automatically on first use.
+CREATE TABLE IF NOT EXISTS consents (
+  email       TEXT NOT NULL,
+  version     TEXT NOT NULL,
+  accepted_at TEXT NOT NULL DEFAULT (datetime('now')),
+  PRIMARY KEY (email, version)
+);

@@ -8,7 +8,7 @@ const TOOL_BRIEF: Record<Tool, string> = {
 Decide whether this funder is worth this office's time for the stated need, and how to approach it.
 Work through: hard eligibility (geography, organisation type, open call vs invite-only, grant size vs need, deadline, instrument), material fit, symbolic fit, drift risk, earmarking and reporting load, acceptability, the best route in (direct, through an existing grantee or regranter, a collaborative, a corporate partnership), what the funder gains from SOS, and how internal resources could be offered as co-financing or leverage.
 Past grants are the best evidence of what a funder really funds. Weigh them above mission statements.`,
-  resources: `TASK: Resource Finder.
+  resources: `TASK: Internal Resource Finder.
 Read the organisation's internal document(s) and find idle, underused or repurposable resources that could meet the stated need, reduce the external ask, or serve as co-financing or collateral.
 First identify what kind of document it is. Use the four internal resource types: human, material, project, saving.
 For asset registers look at: land and buildings with low use, vehicles beyond programme needs, old equipment never disposed of, duplicates across sites, fully depreciated items still in use, and low disposal activity.
@@ -201,7 +201,7 @@ export const RESOURCES_TOOL = {
         maxItems: 3,
         items: {
           type: "object",
-          properties: { title: str(""), asset: str(""), model: str("Revenue or saving model"), who_pays: str("Who pays or benefits"), impact: str("Impact rationale"), first_step: str(""), approver: str("") },
+          properties: { title: str("Short name"), asset: str("The asset or capacity used"), model: str("Revenue or saving model"), who_pays: str("Who pays or benefits"), impact: str("Impact rationale"), first_step: str("First concrete step"), approver: str("Who at SOS approves") },
           required: ["title", "asset", "model", "who_pays", "impact", "first_step", "approver"],
         },
       },

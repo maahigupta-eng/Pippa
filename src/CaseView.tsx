@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { CaseChallenge, CaseProfile, CaseRecord } from "../shared/types";
 import { api } from "./api";
+import AutoText from "./AutoText";
 
 const EMPTY_PROFILE: CaseProfile = { office: "", programmes: "", served: "", scale: "" };
 const EMPTY_CHALLENGE: CaseChallenge = { problem: "", mission: "", stakeholders: "", value: "" };
@@ -44,7 +45,7 @@ export default function CaseView({ cases, onSaved }: { cases: CaseRecord[]; onSa
       const { id } = await api.saveCase({ id: current === "new" ? undefined : current, title, profile, challenge });
       onSaved();
       setCurrent(id);
-      setStatus("Saved. Resource Finder and Funder Check will use this case.");
+      setStatus("Saved. The Internal Resource Finder and Funder Check can now use this case.");
     } catch (e) {
       setStatus((e as Error).message);
     }
@@ -52,10 +53,10 @@ export default function CaseView({ cases, onSaved }: { cases: CaseRecord[]; onSa
 
   return (
     <section>
-      <h1>My case</h1>
+      <h1>The Classroom</h1>
       <p className="lead">
-        The challenge your group is working on in the course. Fill it in once; Pippa reads it before every analysis. Short answers are
-        fine.
+        Your group's case from the course: the four steps from Module 1. Come back here whenever you want to rethink the problem. The
+        Internal Resource Finder and Funder Check can draw on a case from here, or run without one.
       </p>
 
       {cases.length > 0 && (
@@ -74,14 +75,14 @@ export default function CaseView({ cases, onSaved }: { cases: CaseRecord[]; onSa
 
       <label className="field">
         <span>Case title</span>
-        <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Kumasi classroom block" />
+        <AutoText value={title} onChange={setTitle} placeholder="e.g. Kumasi classroom block" />
       </label>
 
       <h2>Your office</h2>
       {PROFILE_FIELDS.map(([k, label, hint]) => (
         <label className="field" key={k}>
           <span>{label}</span>
-          <input value={profile[k]} placeholder={hint} onChange={(e) => setProfile({ ...profile, [k]: e.target.value })} />
+          <AutoText value={profile[k]} placeholder={hint} onChange={(v) => setProfile({ ...profile, [k]: v })} />
         </label>
       ))}
 
@@ -89,7 +90,7 @@ export default function CaseView({ cases, onSaved }: { cases: CaseRecord[]; onSa
       {CHALLENGE_FIELDS.map(([k, label, hint]) => (
         <label className="field" key={k}>
           <span>{label}</span>
-          <textarea rows={3} value={challenge[k]} placeholder={hint} onChange={(e) => setChallenge({ ...challenge, [k]: e.target.value })} />
+          <AutoText minRows={3} value={challenge[k]} placeholder={hint} onChange={(v) => setChallenge({ ...challenge, [k]: v })} />
         </label>
       ))}
 

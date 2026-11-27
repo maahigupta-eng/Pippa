@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { AnalyzeRequest, Answer, CaseRecord, ClarifyResult, FileRole, FunderResult, Need, ResourcesResult, Tool, UploadedFile } from "../shared/types";
 import { api } from "./api";
+import AutoText from "./AutoText";
 import { ACCEPT, MAX_TOTAL_MB, readFile, totalSizeMB } from "./files";
 import { FunderCard, ResourcesCard } from "./Results";
 
@@ -8,8 +9,8 @@ const FORMS = ["Grant", "In-kind", "Corporate partnership", "Loan", "Recoverable
 
 const COPY: Record<Tool, { title: string; lead: string; needHint: string; slots: { role: FileRole; label: string; hint: string[] }[] }> = {
   resources: {
-    title: "Resource Finder",
-    lead: "Find what you already have. Pippa reads your own records for idle or underused capacity that could fund the work, cut the external ask, or count as co-financing.",
+    title: "Internal Resource Finder",
+    lead: "Look inward first. Pippa reads your own organisation's records for idle or underused capacity that could fund the work, cut the external ask, or count as co-financing.",
     needHint: "What you're trying to fund or launch, and what would solve it: cash, space, equipment, staff time, a revenue stream.",
     slots: [
       {
@@ -42,7 +43,7 @@ type Step = "input" | "asking" | "questions" | "running" | "result";
 
 export default function ToolFlow({ tool, cases }: { tool: Tool; cases: CaseRecord[] }) {
   const copy = COPY[tool];
-  const [caseId, setCaseId] = useState<string>(cases[0]?.id ?? "");
+  const [caseId, setCaseId] = useState<string>(cases[0]?.id ?? "none");
   const [need, setNeed] = useState<Need>({ purpose: "", amount: "", forms: [], notes: "" });
   const [files, setFiles] = useState<UploadedFile[]>([]);
   const [pasted, setPasted] = useState<Partial<Record<FileRole, string>>>({});
@@ -53,7 +54,7 @@ export default function ToolFlow({ tool, cases }: { tool: Tool; cases: CaseRecor
   const [error, setError] = useState<string | null>(null);
   const [reading, setReading] = useState(false);
 
-  const effectiveCase = caseId || cases[0]?.id || undefined;
+  const effectiveCase = caseId === "none" ? undefined : caseId || cases[0]?.id || undefined;
 
   const request = (withAnswers?: Answer[]): AnalyzeRequest => ({ tool, caseId: effectiveCase, need, files, pasted, answers: withAnswers });
 
@@ -136,29 +137,30 @@ export default function ToolFlow({ tool, cases }: { tool: Tool; cases: CaseRecor
         <fieldset disabled={step === "asking"}>
           {cases.length > 0 ? (
             <label className="field inline">
-              <span>Case</span>
-              <select value={effectiveCase} onChange={(e) => setCaseId(e.target.value)}>
+              <span>Case from the Classroom</span>
+              <select value={effectiveCase ?? "none"} onChange={(e) => setCaseId(e.target.value)}>
                 {cases.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.title}
                   </option>
                 ))}
+                <option value="none">No case, just this analysis</option>
               </select>
             </label>
           ) : (
             <div className="notice">
-              No case set up yet. Pippa works without one, but the read is sharper with it. <a href="#/case">Set up your case</a>.
+              No case yet. Pippa works without one, but the read is sharper with it. <a href="#/classroom">Add your course case in the Classroom</a>.
             </div>
           )}
 
           <h2>What do you need right now?</h2>
           <label className="field">
             <span>Purpose</span>
-            <textarea rows={3} value={need.purpose} placeholder={copy.needHint} onChange={(e) => setNeed({ ...need, purpose: e.target.value })} />
+            <AutoText minRows={3} value={need.purpose} placeholder={copy.needHint} onChange={(v) => setNeed({ ...need, purpose: v })} />
           </label>
           <label className="field">
             <span>Amount or range</span>
-            <input value={need.amount} placeholder="e.g. €80,000 covers one site; €200,000 covers all four" onChange={(e) => setNeed({ ...need, amount: e.target.value })} />
+            <AutoText value={need.amount} placeholder="e.g. €80,000 covers one site; €200,000 covers all four" onChange={(v) => setNeed({ ...need, amount: v })} />
           </label>
           <div className="field">
             <span>Support you can accept</span>
@@ -177,7 +179,7 @@ export default function ToolFlow({ tool, cases }: { tool: Tool; cases: CaseRecor
           </div>
           <label className="field">
             <span>Anything else Pippa should know (optional)</span>
-            <input value={need.notes} placeholder="Constraints, timeline, what's off the table" onChange={(e) => setNeed({ ...need, notes: e.target.value })} />
+            <AutoText value={need.notes} placeholder="Constraints, timeline, what's off the table" onChange={(v) => setNeed({ ...need, notes: v })} />
           </label>
 
           {copy.slots.map((slot) => (
@@ -207,7 +209,7 @@ export default function ToolFlow({ tool, cases }: { tool: Tool; cases: CaseRecor
               </ul>
               <label className="field">
                 <span>Or paste text</span>
-                <textarea rows={4} value={pasted[slot.role] ?? ""} onChange={(e) => setPasted({ ...pasted, [slot.role]: e.target.value })} />
+                <AutoText minRows={4} value={pasted[slot.role] ?? ""} onChange={(v) => setPasted({ ...pasted, [slot.role]: v })} />
               </label>
             </div>
           ))}
@@ -239,7 +241,7 @@ export default function ToolFlow({ tool, cases }: { tool: Tool; cases: CaseRecor
               <label className="field" key={q.id}>
                 <span>{q.question}</span>
                 <small className="muted">{q.why}</small>
-                <textarea rows={2} value={answers[q.id] ?? ""} onChange={(e) => setAnswers({ ...answers, [q.id]: e.target.value })} />
+                <AutoText minRows={2} value={answers[q.id] ?? ""} onChange={(v) => setAnswers({ ...answers, [q.id]: v })} />
               </label>
             ))}
             <div className="cta-row">

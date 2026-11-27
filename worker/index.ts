@@ -73,13 +73,32 @@ async function callClaude(env: Env, tool: Tool, phase: "clarify" | "analyze", re
   });
   if (!res.ok) {
     const detail = await res.text();
-    console.error("Anthropic error", res.status, detail.slice(0, 500));
-    throw new Error(res.status === 413 ? "Those files are too large. Try fewer pages or paste the key sections." : "Pippa couldn't reach the AI service. Try again in a minute.");
+    console.error("Anthropic error", res.status, detail.slice(0, 1000));
+    throw new Error(explainAnthropicError(res.status, detail, env.MODEL));
   }
   const body = (await res.json()) as { content: { type: string; name?: string; input?: unknown }[] };
   const call = body.content.find((c) => c.type === "tool_use");
   if (!call?.input) throw new Error("Pippa returned an empty answer. Try again.");
   return call.input as Record<string, unknown>;
+}
+
+/** Turn an Anthropic API error into a message that says what to fix. */
+function explainAnthropicError(status: number, body: string, model: string): string {
+  let msg = "";
+  try {
+    msg = (JSON.parse(body) as { error?: { message?: string } }).error?.message ?? "";
+  } catch {
+    msg = body.slice(0, 200);
+  }
+  const lower = msg.toLowerCase();
+  if (status === 401) return "The AI key was rejected. Check the ANTHROPIC_API_KEY secret in Cloudflare (no spaces, the full key).";
+  if (status === 403) return `The AI key doesn't have permission for this request. (${msg})`;
+  if (lower.includes("credit balance")) return "The Anthropic account is out of credit. Add credit in the Anthropic console under Billing.";
+  if (status === 404 || lower.includes("model")) return `The AI model "${model}" wasn't accepted. (${msg})`;
+  if (status === 413) return "Those files are too large. Try fewer pages or paste the key sections.";
+  if (status === 429) return "Too many requests to the AI service right now. Wait a minute and try again.";
+  if (status === 529 || status >= 500) return "The AI service is busy. Try again in a minute.";
+  return `The AI service returned an error (${status}): ${msg || "no details"}`;
 }
 
 // ---------- Helpers ----------
@@ -101,18 +120,59 @@ async function loadCase(env: Env, email: string, id?: string): Promise<CaseRecor
   return row ? { id: row.id, title: row.title, profile: JSON.parse(row.profile), challenge: JSON.parse(row.challenge), updated_at: row.updated_at } : null;
 }
 
+// ---------- Schema (created on first use, so no manual console step) ----------
+
+/** Bump when the Terms or Privacy Notice change materially; users are asked to accept again. */
+const TERMS_VERSION = "2026-11-26";
+
+let schemaReady = false;
+async function ensureSchema(env: Env) {
+  if (schemaReady) return;
+  await env.DB.batch([
+    env.DB.prepare("CREATE TABLE IF NOT EXISTS users (email TEXT PRIMARY KEY, created_at TEXT NOT NULL DEFAULT (datetime('now')))"),
+    env.DB.prepare("CREATE TABLE IF NOT EXISTS cases (id TEXT PRIMARY KEY, email TEXT NOT NULL, title TEXT NOT NULL, profile TEXT NOT NULL, challenge TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT (datetime('now')), updated_at TEXT NOT NULL DEFAULT (datetime('now')))"),
+    env.DB.prepare("CREATE TABLE IF NOT EXISTS runs (id TEXT PRIMARY KEY, email TEXT NOT NULL, case_id TEXT, tool TEXT NOT NULL, title TEXT NOT NULL, need TEXT NOT NULL, output TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT (datetime('now')))"),
+    env.DB.prepare("CREATE TABLE IF NOT EXISTS usage (email TEXT NOT NULL, day TEXT NOT NULL, calls INTEGER NOT NULL DEFAULT 0, PRIMARY KEY (email, day))"),
+    env.DB.prepare("CREATE TABLE IF NOT EXISTS consents (email TEXT NOT NULL, version TEXT NOT NULL, accepted_at TEXT NOT NULL DEFAULT (datetime('now')), PRIMARY KEY (email, version))"),
+  ]);
+  schemaReady = true;
+}
+
+async function hasAccepted(env: Env, email: string): Promise<boolean> {
+  const row = await env.DB.prepare("SELECT 1 AS ok FROM consents WHERE email = ?1 AND version = ?2").bind(email, TERMS_VERSION).first();
+  return !!row;
+}
+
 // ---------- Routes ----------
 
 async function handleApi(req: Request, env: Env, url: URL): Promise<Response> {
   const email = await getEmail(req, env);
   if (!email) return fail(401, "Please sign in with the email you were invited on.");
+  await ensureSchema(env);
   await env.DB.prepare("INSERT OR IGNORE INTO users (email) VALUES (?1)").bind(email).run();
   const path = url.pathname.replace(/\/+$/, "");
   const method = req.method;
 
   if (path === "/api/me" && method === "GET") {
     const admins = (env.ADMIN_EMAILS || "").split(",").map((s) => s.trim().toLowerCase()).filter(Boolean);
-    return json({ email, admin: admins.includes(email) });
+    return json({ email, admin: admins.includes(email), accepted: await hasAccepted(env, email), termsVersion: TERMS_VERSION });
+  }
+
+  if (path === "/api/consent" && method === "POST") {
+    await env.DB.prepare("INSERT OR IGNORE INTO consents (email, version) VALUES (?1, ?2)").bind(email, TERMS_VERSION).run();
+    return json({ ok: true });
+  }
+
+  // Delete everything Pippa holds about this user (Privacy Notice: right to erasure).
+  if (path === "/api/me/data" && method === "DELETE") {
+    await env.DB.batch([
+      env.DB.prepare("DELETE FROM runs WHERE email = ?1").bind(email),
+      env.DB.prepare("DELETE FROM cases WHERE email = ?1").bind(email),
+      env.DB.prepare("DELETE FROM usage WHERE email = ?1").bind(email),
+      env.DB.prepare("DELETE FROM consents WHERE email = ?1").bind(email),
+      env.DB.prepare("DELETE FROM users WHERE email = ?1").bind(email),
+    ]);
+    return json({ ok: true });
   }
 
   // Cases
@@ -168,6 +228,7 @@ async function handleApi(req: Request, env: Env, url: URL): Promise<Response> {
     if (!validRequest(body)) return fail(400, "Something is missing from the form.");
     if (!hasMaterial(body)) return fail(400, "Add at least one document or paste some text.");
     if (!body.need.purpose?.trim()) return fail(400, "Say what you need right now. Pippa scores everything against it.");
+    if (!(await hasAccepted(env, email))) return fail(403, "Please accept the Terms of Use and Privacy Notice first (reload the page).");
     if (!(await takeQuota(env, email))) return fail(429, `You've reached today's limit of ${env.DAILY_RUN_LIMIT} Pippa calls. It resets at midnight UTC.`);
 
     const kase = await loadCase(env, email, body.caseId);
@@ -179,7 +240,7 @@ async function handleApi(req: Request, env: Env, url: URL): Promise<Response> {
       const title =
         body.tool === "funder"
           ? `Funder Check: ${(out.funder_name as string) || "funder"}`
-          : `Resource Finder: ${(out.document_type as string) || "document"}`;
+          : `Internal Resource Finder: ${(out.document_type as string) || "document"}`;
       await env.DB.prepare("INSERT INTO runs (id, email, case_id, tool, title, need, output) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)")
         .bind(id, email, kase?.id ?? null, body.tool, title, JSON.stringify({ need: body.need, answers: body.answers ?? [] }), JSON.stringify(out))
         .run();

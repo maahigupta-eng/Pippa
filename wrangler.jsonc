@@ -14,6 +14,8 @@
   // Pippa lives at pippa.<account>.workers.dev, with Cloudflare Access
   // switched on for that address in the dashboard (no custom domain needed).
   "workers_dev": true,
+  // Keep logs so errors can be read in Cloudflare → pippa → Observability.
+  "observability": { "enabled": true },
   "d1_databases": [
     {
       "binding": "DB",

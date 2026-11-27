@@ -21,7 +21,9 @@ async function call<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export const api = {
-  me: () => call<{ email: string; admin: boolean }>("/api/me"),
+  me: () => call<{ email: string; admin: boolean; accepted: boolean; termsVersion: string }>("/api/me"),
+  consent: () => call<{ ok: true }>("/api/consent", { method: "POST" }),
+  deleteMyData: () => call<{ ok: true }>("/api/me/data", { method: "DELETE" }),
   cases: () => call<CaseRecord[]>("/api/cases"),
   saveCase: (c: Partial<CaseRecord>) => call<{ id: string }>("/api/cases", { method: "POST", body: JSON.stringify(c) }),
   deleteCase: (id: string) => call<{ ok: true }>(`/api/cases/${id}`, { method: "DELETE" }),
