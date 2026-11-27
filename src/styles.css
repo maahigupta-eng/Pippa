@@ -390,3 +390,24 @@ footer p { margin: 6px 0; }
 .promises { list-style: none; padding: 0; margin: 28px 0 0; display: flex; flex-wrap: wrap; gap: 10px 24px; color: var(--muted); font-size: 0.9rem; }
 .promises li::before { content: "✓"; color: var(--green); font-weight: 700; margin-right: 8px; }
 @media (max-width: 860px) { .step-cards { grid-template-columns: 1fr; } .landing-head h1 { font-size: 1.8rem; } }
+
+/* Contact page */
+.contact .lead { margin-bottom: 8px; }
+.contact-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-top: 28px; }
+.contact-card { position: relative; background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 0 28px 28px; text-align: center; overflow: hidden; transition: transform 0.18s, box-shadow 0.18s; }
+.contact-card:hover { transform: translateY(-3px); box-shadow: 0 14px 34px rgba(29, 35, 32, 0.12); }
+.contact-band { height: 96px; margin: 0 -28px; position: relative; }
+.contact-band::after { content: ""; position: absolute; inset: 0; background-image: radial-gradient(rgba(255, 255, 255, 0.22) 1.5px, transparent 1.5px); background-size: 14px 14px; }
+.tone-green .contact-band { background: linear-gradient(135deg, #2f5d50, #4f8a72 60%, #b9d7c5); }
+.tone-blue .contact-band { background: linear-gradient(135deg, #2c4f7a, #4d79a8 60%, #c3d6eb); }
+.avatar { width: 116px; height: 116px; border-radius: 50%; object-fit: cover; border: 5px solid var(--card); margin: -58px auto 12px; display: block; position: relative; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12); background: var(--paper); }
+.avatar-initials { display: grid; place-items: center; font-family: var(--serif); font-size: 2.2rem; font-weight: 600; color: #fff; }
+.tone-green .avatar-initials { background: #2f5d50; } .tone-blue .avatar-initials { background: #2c4f7a; }
+.contact-card h2 { font-size: 1.45rem; margin: 4px 0 2px; }
+.contact-role { margin: 0; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; }
+.tone-green .contact-role { color: #2f7a4f; } .tone-blue .contact-role { color: #2c5b8a; }
+.contact-line { color: var(--muted); margin: 12px auto 18px; max-width: 320px; }
+.contact-links { display: flex; flex-direction: column; gap: 10px; align-items: stretch; }
+.contact-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--line); color: var(--ink); text-decoration: none; font-weight: 500; transition: background 0.15s, border-color 0.15s; word-break: break-all; }
+.tone-green .contact-btn:hover { background: #e9f4ee; border-color: #2f7a4f; }
+.tone-blue .contact-btn:hover { background: #eaf1f9; border-color: #2c5b8a; }

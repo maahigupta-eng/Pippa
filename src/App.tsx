@@ -4,6 +4,7 @@ import { api } from "./api";
 import CaseView from "./CaseView";
 import ToolFlow from "./ToolFlow";
 import About from "./About";
+import Contact from "./Contact";
 import { ConsentGate, Privacy, Terms } from "./Legal";
 import { ResultView } from "./Results";
 import { SITE } from "./config";
@@ -17,7 +18,8 @@ type View =
   | { name: "run"; id: string }
   | { name: "about" }
   | { name: "privacy" }
-  | { name: "terms" };
+  | { name: "terms" }
+  | { name: "contact" };
 
 function readHash(): View {
   const h = location.hash.replace(/^#\/?/, "");
@@ -29,6 +31,7 @@ function readHash(): View {
   if (h === "about") return { name: "about" };
   if (h === "privacy") return { name: "privacy" };
   if (h === "terms") return { name: "terms" };
+  if (h === "contact") return { name: "contact" };
   return { name: "home" };
 }
 
@@ -78,7 +81,7 @@ export default function App() {
   ];
 
   // The legal pages stay readable while the acceptance prompt is showing.
-  const showGate = accepted === false && view.name !== "privacy" && view.name !== "terms";
+  const showGate = accepted === false && view.name !== "privacy" && view.name !== "terms" && view.name !== "contact";
 
   return (
     <div className="shell">
@@ -118,6 +121,7 @@ export default function App() {
         {view.name === "about" && <About />}
         {view.name === "privacy" && <Privacy />}
         {view.name === "terms" && <Terms />}
+        {view.name === "contact" && <Contact />}
         </ErrorBoundary>
       </main>
 
@@ -126,7 +130,7 @@ export default function App() {
           <a href="#/privacy">Privacy Notice</a>
           <a href="#/terms">Terms of Use</a>
           <a href="#/about">About</a>
-          <a href={`mailto:${SITE.contactEmail}`}>Contact</a>
+          <a href="#/contact">Contact</a>
         </nav>
         <p>Pippa uses AI. Check results before you act on them. Don't upload files that name children, families or staff.</p>
         <p>© 2026 Pippa</p>
