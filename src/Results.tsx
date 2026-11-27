@@ -118,6 +118,8 @@ function Gauge({ label, value, invert, reason }: { label: string; value: number;
 export function FunderCard({ r: raw }: { r: FunderResult }) {
   const r = normalizeFunder(raw);
   const tone = VERDICT_TONE[r.verdict] ?? "ok";
+  const sc = r.scores;
+  const hasScores = [sc.material, sc.symbolic, sc.drift].some((x) => x.score > 0 || x.reason);
   return (
     <article className="result">
       <header className={`hero hero-${tone}`}>
@@ -135,12 +137,18 @@ export function FunderCard({ r: raw }: { r: FunderResult }) {
         )}
       </header>
 
-      <div className="gauges">
-        <Gauge label="Material fit" value={r.scores.material.score} reason={r.scores.material.reason} />
-        <Gauge label="Symbolic fit" value={r.scores.symbolic.score} reason={r.scores.symbolic.reason} />
-        <Gauge label="Drift risk" value={r.scores.drift.score} reason={r.scores.drift.reason} invert />
-      </div>
-      <FunderLegend />
+      {hasScores ? (
+        <>
+          <div className="gauges">
+            <Gauge label="Material fit" value={r.scores.material.score} reason={r.scores.material.reason} />
+            <Gauge label="Symbolic fit" value={r.scores.symbolic.score} reason={r.scores.symbolic.reason} />
+            <Gauge label="Drift risk" value={r.scores.drift.score} reason={r.scores.drift.reason} invert />
+          </div>
+          <FunderLegend />
+        </>
+      ) : (
+        <p className="muted small">Fit scores weren't returned for this run. The verdict rests on the reasoning above.</p>
+      )}
 
       {r.hard_checks.length > 0 && (
         <section className="checks">

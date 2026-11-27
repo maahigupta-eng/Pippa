@@ -279,6 +279,7 @@ MODE: FOLLOW-UP QUESTIONS. The analysis below is finished. The user is asking ab
 - Ground answers in the analysis and the user's stated need and answers. You no longer have the original documents; if a question needs them, say so and suggest what to check.
 - You may explain terms, reasoning and ratings, suggest how to explain or pitch something, or help the user decide what to do first.
 - Never invent facts, figures or funder details. Never write a full proposal; short talking points are fine.
+- After your answer, write a line with only "---", then up to 3 short follow-up questions the user might want to ask next, one per line. Write them in the user's voice, each under 10 words, specific to this analysis.
 
 THE ANALYSIS (${run.title}):
 ${run.output}
@@ -297,8 +298,19 @@ ${run.need}`;
       return fail(502, explainAnthropicError(res.status, detail, env.MODEL));
     }
     const out = (await res.json()) as { content: { type: string; text?: string }[] };
-    const answer = out.content.filter((c) => c.type === "text").map((c) => c.text ?? "").join("\n").trim();
-    return json({ answer: answer || "Sorry, I couldn't come up with an answer. Try asking another way." });
+    const full = out.content.filter((c) => c.type === "text").map((c) => c.text ?? "").join("\n").trim();
+    // Split off the follow-up suggestions after the "---" line.
+    const parts = full.split(/\n\s*-{3,}\s*\n/);
+    const answer = (parts.length > 1 ? parts.slice(0, -1).join("\n") : full).trim();
+    const followups =
+      parts.length > 1
+        ? parts[parts.length - 1]
+            .split("\n")
+            .map((l) => l.replace(/^\s*([-*•]|\d+[.)])\s*/, "").trim())
+            .filter((l) => l.length > 3 && l.length < 120)
+            .slice(0, 3)
+        : [];
+    return json({ answer: answer || "Sorry, I couldn't come up with an answer. Try asking another way.", followups });
   }
 
   // AI: clarify, then analyze

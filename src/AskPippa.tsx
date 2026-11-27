@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { Tool } from "../shared/types";
 import { api } from "./api";
 
-type Msg = { role: "user" | "assistant"; content: string };
+type Msg = { role: "user" | "assistant"; content: string; followups?: string[] };
 
 const SUGGESTIONS: Record<Tool, string[]> = {
   resources: [
@@ -52,6 +52,7 @@ function Formatted({ text }: { text: string }) {
 
 export default function AskPippa({ runId, tool }: { runId: string; tool: Tool }) {
   const [open, setOpen] = useState(false);
+  const [big, setBig] = useState(false);
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
@@ -76,8 +77,11 @@ export default function AskPippa({ runId, tool }: { runId: string; tool: Tool })
     setBusy(true);
     setError(null);
     try {
-      const { answer } = await api.ask(runId, next);
-      setMsgs([...next, { role: "assistant", content: answer }]);
+      const { answer, followups } = await api.ask(
+        runId,
+        next.map(({ role, content }) => ({ role, content })),
+      );
+      setMsgs([...next, { role: "assistant", content: answer, followups }]);
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -89,20 +93,42 @@ export default function AskPippa({ runId, tool }: { runId: string; tool: Tool })
     return (
       <button className="ask-fab no-print" onClick={() => setOpen(true)}>
         <span className="mark small">P</span> Ask Pippa
+        {msgs.length > 0 && <span className="ask-badge">{msgs.filter((m) => m.role === "assistant").length}</span>}
       </button>
     );
   }
 
   return (
-    <aside className="ask-panel no-print" aria-label="Ask Pippa about this analysis">
+    <>
+    {big && <div className="ask-scrim no-print" onClick={() => setBig(false)} />}
+    <aside className={`ask-panel no-print ${big ? "big" : ""}`} aria-label="Ask Pippa about this analysis">
       <header className="ask-head">
         <div>
           <strong>Ask Pippa</strong>
           <p>About this analysis. Pippa can see the result and what you told it, not your original files.</p>
         </div>
-        <button className="link ask-close" onClick={() => setOpen(false)} aria-label="Close">
-          ✕
-        </button>
+        <div className="ask-controls">
+          <button className="ask-ctl" onClick={() => setOpen(false)} aria-label="Minimise" title="Minimise (keeps the conversation)">
+            –
+          </button>
+          <button className="ask-ctl" onClick={() => setBig(!big)} aria-label={big ? "Make smaller" : "Make bigger"} title={big ? "Make smaller" : "Make bigger"}>
+            {big ? "⤡" : "⤢"}
+          </button>
+          <button
+            className="ask-ctl"
+            onClick={() => {
+              if (msgs.length === 0 || confirm("Close and clear this conversation?")) {
+                setMsgs([]);
+                setBig(false);
+                setOpen(false);
+              }
+            }}
+            aria-label="Close and clear"
+            title="Close and clear"
+          >
+            ✕
+          </button>
+        </div>
       </header>
 
       <div className="ask-body">
@@ -117,8 +143,17 @@ export default function AskPippa({ runId, tool }: { runId: string; tool: Tool })
           </div>
         )}
         {msgs.map((m, i) => (
-          <div key={i} className={`bubble ${m.role}`}>
-            {m.role === "assistant" ? <Formatted text={m.content} /> : m.content}
+          <div key={i} className={`bubble-wrap ${m.role}`}>
+            <div className={`bubble ${m.role}`}>{m.role === "assistant" ? <Formatted text={m.content} /> : m.content}</div>
+            {m.role === "assistant" && i === msgs.length - 1 && !busy && m.followups && m.followups.length > 0 && (
+              <div className="followups">
+                {m.followups.map((f) => (
+                  <button key={f} className="suggest small" onClick={() => send(f)}>
+                    {f}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         ))}
         {busy && (
@@ -157,5 +192,6 @@ export default function AskPippa({ runId, tool }: { runId: string; tool: Tool })
         </button>
       </form>
     </aside>
+    </>
   );
 }

@@ -95,16 +95,6 @@ export function userContent(req: AnalyzeRequest, kase: CaseRecord | null, phase:
 const str = (description: string) => ({ type: "string", description });
 const level = (description: string) => ({ type: "string", enum: ["low", "medium", "high"], description });
 const strList = (description: string) => ({ type: "array", items: { type: "string" }, description });
-const nextStep = {
-  type: "object",
-  properties: { action: str("One concrete action, under 15 words"), owner: str("Role, under 5 words"), within: str("Timeframe, e.g. 'two weeks'") },
-  required: ["action", "owner", "within"],
-};
-const score = (d: string) => ({
-  type: "object",
-  properties: { score: { type: "integer", minimum: 0, maximum: 100 }, reason: str(`One sentence, under 20 words. ${d}`) },
-  required: ["score", "reason"],
-});
 
 export const CLARIFY_TOOL = {
   name: "clarify",
@@ -139,15 +129,12 @@ export const FUNDER_TOOL = {
       confidence: level("Confidence in the verdict"),
       would_change_if: str("One short phrase, under 15 words"),
       summary: str("At most 2 short sentences (under 40 words), outcome first"),
-      scores: {
-        type: "object",
-        properties: {
-          material: score("Does the substance line up?"),
-          symbolic: score("Does the story line up?"),
-          drift: score("How far SOS would have to bend; higher is worse."),
-        },
-        required: ["material", "symbolic", "drift"],
-      },
+      material_score: { type: "integer", minimum: 0, maximum: 100, description: "Material fit 0-100: does the substance line up?" },
+      material_reason: str("One sentence, under 20 words"),
+      symbolic_score: { type: "integer", minimum: 0, maximum: 100, description: "Symbolic fit 0-100: does the story line up?" },
+      symbolic_reason: str("One sentence, under 20 words"),
+      drift_score: { type: "integer", minimum: 0, maximum: 100, description: "Drift risk 0-100: how far SOS would have to bend; higher is worse" },
+      drift_reason: str("One sentence, under 20 words"),
       hard_checks: {
         type: "array",
         items: {
@@ -157,15 +144,18 @@ export const FUNDER_TOOL = {
         },
       },
       what_funder_gets: { ...strList("What this funder gains from SOS, in its own terms. Each item under 15 words."), maxItems: 4 },
-      route_in: { type: "object", properties: { route: str("Under 8 words, e.g. 'Concept note in the March open call'"), why: str("One sentence, under 20 words") }, required: ["route", "why"] },
+      route: str("Best route in, under 8 words, e.g. 'Concept note in the March open call'"),
+      route_why: str("Why that route, one sentence under 20 words"),
       positioning: { ...strList("Three talking points for framing the ask, each under 15 words. Not proposal text."), maxItems: 4 },
       internal_leverage: { ...strList("Internal resources to offer as co-financing, each under 15 words; empty if unknown"), maxItems: 4 },
       unverified: { ...strList("What the materials do not establish, each under 12 words"), maxItems: 5 },
-      next_step: nextStep,
+      next_action: str("One concrete next action, under 15 words"),
+      next_owner: str("Who does it, a role under 5 words"),
+      next_within: str("Timeframe, e.g. 'two weeks'"),
       questions_they_will_ask: { ...strList("Questions the funder will likely ask, each under 15 words"), maxItems: 4 },
       systems_change: str("One sentence under 25 words if there is a real systems-change angle; otherwise empty string"),
     },
-    required: ["funder_name", "verdict", "confidence", "would_change_if", "summary", "scores", "hard_checks", "what_funder_gets", "route_in", "positioning", "internal_leverage", "unverified", "next_step", "questions_they_will_ask"],
+    required: ["funder_name", "verdict", "confidence", "would_change_if", "summary", "material_score", "material_reason", "symbolic_score", "symbolic_reason", "drift_score", "drift_reason", "hard_checks", "what_funder_gets", "route", "route_why", "positioning", "internal_leverage", "unverified", "next_action", "next_owner", "next_within", "questions_they_will_ask"],
   },
 };
 
@@ -209,8 +199,10 @@ export const RESOURCES_TOOL = {
       leverage: { ...strList("What can be offered to funders as co-financing or collateral, each under 15 words"), maxItems: 4 },
       cautions: { ...strList("Most important cautions first: safeguarding, donor restrictions, approvals. Each under 20 words."), maxItems: 4 },
       unverified: { ...strList("What the document does not establish, each under 12 words"), maxItems: 5 },
-      next_step: nextStep,
+      next_action: str("One concrete next action, under 15 words"),
+      next_owner: str("Who does it, a role under 5 words"),
+      next_within: str("Timeframe, e.g. 'two weeks'"),
     },
-    required: ["document_type", "document_summary", "headline", "opportunities", "top", "leverage", "cautions", "unverified", "next_step"],
+    required: ["document_type", "document_summary", "headline", "opportunities", "top", "leverage", "cautions", "unverified", "next_action", "next_owner", "next_within"],
   },
 };

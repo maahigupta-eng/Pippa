@@ -110,7 +110,7 @@ export default function App() {
       <main>
         <ErrorBoundary resetKey={location.hash}>
         {authError && <div className="notice error">{authError}</div>}
-        {view.name === "home" && <Home hasCase={cases.length > 0} />}
+        {view.name === "home" && <Home cases={cases} />}
         {view.name === "classroom" && <CaseView cases={cases} onSaved={refreshCases} />}
         {view.name === "tool" && <ToolFlow key={view.tool} tool={view.tool} cases={cases} />}
         {view.name === "saved" && <Saved />}
@@ -137,41 +137,98 @@ export default function App() {
   );
 }
 
-function Home({ hasCase }: { hasCase: boolean }) {
-  return (
-    <section className="home">
-      <h1>Find the resources you have, then the partners worth your time.</h1>
-      <p className="lead">
-        Pippa runs the method from the course on your own documents. It looks inside your organisation first, then at funders, and tells
-        you plainly what is worth pursuing and how to frame it.
-      </p>
+function Home({ cases }: { cases: CaseRecord[] }) {
+  const [runs, setRuns] = useState<RunRecord[] | null>(null);
+  useEffect(() => {
+    api.runs().then(setRuns).catch(() => setRuns([]));
+  }, []);
 
-      <ol className="steps">
-        <li>
-          <strong>Your case.</strong> The four steps from Module 1: problem, mission, stakeholders, value proposition. Set it up once and come
-          back whenever you want to rethink the problem. Everything after builds on it.
-        </li>
-        <li>
-          <strong>Internal resources.</strong> Give Pippa an asset register, budget or programme report. It finds idle or underused capacity,
-          each item traced to a line in your document.
-        </li>
-        <li>
-          <strong>Funder check.</strong> Give Pippa a funder's own materials. It scores the fit, checks eligibility, names the best route in,
-          and says what SOS can offer them.
-        </li>
+  const lastOf = (tool: Tool) => runs?.find((r) => r.tool === tool);
+  const fmt = (d: string) => new Date(d + "Z").toLocaleDateString(undefined, { day: "numeric", month: "short" });
+  const caseDone = cases.length > 0;
+  const resDone = !!lastOf("resources");
+  const funDone = !!lastOf("funder");
+  const next = !caseDone ? 1 : !resDone ? 2 : 3;
+
+  const steps = [
+    {
+      n: 1,
+      path: "case",
+      title: "Your case",
+      blurb: "The four steps from Module 1: problem, mission, stakeholders, value proposition.",
+      status: caseDone ? `Done · ${cases[0].title}` : "Start here",
+      done: caseDone,
+      action: caseDone ? "Revisit" : "Set up your case",
+    },
+    {
+      n: 2,
+      path: "resources",
+      title: "Internal resources",
+      blurb: "Find idle or underused buildings, equipment, staff time and money inside SOS.",
+      status: resDone ? `Last run ${fmt(lastOf("resources")!.created_at)}` : "Not run yet",
+      done: resDone,
+      action: resDone ? "Run again" : "Look inward",
+    },
+    {
+      n: 3,
+      path: "funder",
+      title: "Funder check",
+      blurb: "Is a funder worth your time? Fit, eligibility, the best route in, and what you can offer them.",
+      status: funDone ? `Last run ${fmt(lastOf("funder")!.created_at)}` : "Not run yet",
+      done: funDone,
+      action: funDone ? "Check another" : "Check a funder",
+    },
+  ];
+
+  return (
+    <section className="landing">
+      <div className="landing-head">
+        <h1>Look inward first. Then find the partners worth your time.</h1>
+        <p className="lead">Three steps, in the order you learned them in the course. Pippa reads your documents and tells you plainly what's worth pursuing.</p>
+      </div>
+
+      <ol className="step-cards">
+        {steps.map((st) => (
+          <li key={st.n} className={`step-card ${st.n === next ? "is-next" : ""} ${st.done ? "is-done" : ""}`}>
+            <a href={`#/${st.path}`}>
+              <div className="step-card-top">
+                <span className="step-badge">{st.done ? "✓" : st.n}</span>
+                {st.n === next && <span className="next-tag">Next</span>}
+              </div>
+              <h2>{st.title}</h2>
+              <p>{st.blurb}</p>
+              <p className="step-status">{st.status}</p>
+              <span className="step-action">{st.action} →</span>
+            </a>
+          </li>
+        ))}
       </ol>
 
-      <div className="cta-row">
-        <button className="primary" onClick={() => go(hasCase ? "resources" : "case")}>
-          {hasCase ? "Continue to step 2: internal resources" : "Start with step 1: your case"}
-        </button>
-        {hasCase && <button onClick={() => go("case")}>Revisit your case</button>}
-      </div>
+      {runs && runs.length > 0 && (
+        <div className="recent">
+          <div className="recent-head">
+            <h3>Recent analyses</h3>
+            <a href="#/saved">See all</a>
+          </div>
+          <ul>
+            {runs.slice(0, 4).map((r) => (
+              <li key={r.id}>
+                <a href={`#/run/${r.id}`}>
+                  <span className={`recent-dot ${r.tool}`} />
+                  <span className="recent-title">{r.title.replace(/^Resource Finder:/, "Internal Resource Finder:")}</span>
+                  <span className="muted small">{fmt(r.created_at)}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
-      <div className="notice">
-        Pippa asks before it answers. Expect two to four questions after you upload. Answering them makes the read sharper; you can skip
-        them.
-      </div>
+      <ul className="promises">
+        <li>Works only from what you give it</li>
+        <li>Asks before it answers</li>
+        <li>Your material is never used to train AI</li>
+      </ul>
     </section>
   );
 }

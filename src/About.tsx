@@ -4,7 +4,9 @@ export default function About() {
       <h1>About Pippa</h1>
       <p className="lead">
         Pippa carries the method from the course into everyday work. It helps resource mobilisers see what their organisation already has,
-        find the partners worth their time, and frame an ask those partners will want to answer.
+        find the partners worth their time, and frame an ask those partners will want to answer. It is built to work only from what you
+        give it: every point traces back to your documents or your answers, and when something isn't there, Pippa says so instead of
+        guessing.
       </p>
 
       <h2>Why it exists</h2>
@@ -33,26 +35,20 @@ export default function About() {
         </li>
       </ol>
 
-      <h2>What Pippa won't do</h2>
-      <p>
-        It won't make things up, write your proposal, or tell you what you want to hear. Every point it makes traces back to something you
-        gave it. When there's no good opportunity, it says so.
-      </p>
-
       <h2>The people behind it</h2>
       <div className="people">
-        <div>
-          <h3>Andras Vamos-Goldman</h3>
-          <p>
-            Canadian diplomat, international lawyer and social entrepreneur. He teaches at NYU's Center for Global Affairs and conceived
-            Pippa as part of rethinking how social-impact organisations raise resources.
-          </p>
-        </div>
         <div>
           <h3>Maahi Gupta</h3>
           <p>
             Designed and built Pippa. She holds an M.S. in Transnational Security from NYU's Center for Global Affairs and works across
             research, policy and product design.
+          </p>
+        </div>
+        <div>
+          <h3>Andras Vamos-Goldman</h3>
+          <p>
+            Canadian diplomat, international lawyer and social entrepreneur. He conceived Pippa as part of rethinking how social-impact
+            organisations raise resources.
           </p>
         </div>
       </div>
