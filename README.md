@@ -6,7 +6,7 @@ Resource-mobilisation assistant for SOS Children's Villages course participants.
 - **API:** one Cloudflare Worker (`worker/`) that also serves the built site
 - **Brain:** `worker/playbook.md`, loaded into every AI call. Edit it in plain English.
 - **Data:** Cloudflare D1 (`schema.sql`): cases, saved analyses, daily usage
-- **Sign-in:** Cloudflare Access (one-time PIN to invited emails), verified again inside the Worker
+- **Sign-in:** Cloudflare Access (one-time PIN to invited emails) on pippa.maahigupta.workers.dev, verified again inside the Worker
 
 ## First-time setup (about 30 minutes)
 
