@@ -11,9 +11,9 @@
   },
   // The playbook is bundled into the Worker as plain text.
   "rules": [{ "type": "Text", "globs": ["**/*.md"], "fallthrough": true }],
-  // Turn off the public *.workers.dev address so the only way in is the
-  // Access-protected custom domain. Re-enable only for testing.
-  "workers_dev": false,
+  // Pippa lives at pippa.<account>.workers.dev, with Cloudflare Access
+  // switched on for that address in the dashboard (no custom domain needed).
+  "workers_dev": true,
   "d1_databases": [
     {
       "binding": "DB",
