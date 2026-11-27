@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { AnalyzeRequest, Answer, CaseRecord, ClarifyResult, FileRole, FunderResult, Need, ResourcesResult, Tool, UploadedFile } from "../shared/types";
 import { api } from "./api";
 import AutoText from "./AutoText";
+import Thinking from "./Thinking";
 import { ACCEPT, MAX_TOTAL_MB, readFile, totalSizeMB } from "./files";
 import { FunderCard, ResourcesCard } from "./Results";
 
@@ -215,12 +216,16 @@ export default function ToolFlow({ tool, cases }: { tool: Tool; cases: CaseRecor
             </div>
           ))}
 
-          <div className="cta-row">
-            <button className="primary" onClick={start} disabled={!canStart}>
-              {step === "asking" ? "Pippa is reading…" : "Continue"}
-            </button>
-            {!need.purpose.trim() && <span className="muted">Say what you need first.</span>}
-          </div>
+          {step === "asking" ? (
+            <Thinking kind="clarify" />
+          ) : (
+            <div className="cta-row">
+              <button className="primary" onClick={start} disabled={!canStart}>
+                Continue
+              </button>
+              {!need.purpose.trim() && <span className="muted">Say what you need first.</span>}
+            </div>
+          )}
         </fieldset>
       ) : null}
 
@@ -245,22 +250,26 @@ export default function ToolFlow({ tool, cases }: { tool: Tool; cases: CaseRecor
                 <AutoText minRows={2} value={answers[q.id] ?? ""} onChange={(v) => setAnswers({ ...answers, [q.id]: v })} />
               </label>
             ))}
-            <div className="cta-row">
-              <button className="primary" onClick={() => run(clarify.questions.map((q) => ({ id: q.id, question: q.question, answer: answers[q.id] ?? "" })))}>
-                {step === "running" ? "Pippa is working… (up to a minute)" : "Run the analysis"}
-              </button>
-              <button className="link" onClick={() => run([])}>
-                Skip questions
-              </button>
-              <button className="link" onClick={() => setStep("input")}>
-                Back
-              </button>
-            </div>
+            {step === "running" ? (
+              <Thinking kind={tool} />
+            ) : (
+              <div className="cta-row">
+                <button className="primary" onClick={() => run(clarify.questions.map((q) => ({ id: q.id, question: q.question, answer: answers[q.id] ?? "" })))}>
+                  Run the analysis
+                </button>
+                <button className="link" onClick={() => run([])}>
+                  Skip questions
+                </button>
+                <button className="link" onClick={() => setStep("input")}>
+                  Back
+                </button>
+              </div>
+            )}
           </fieldset>
         </div>
       )}
 
-      {step === "running" && !clarify && <p className="muted">Pippa is working… (up to a minute)</p>}
+      {step === "running" && !clarify && <Thinking kind={tool} />}
     </section>
   );
 }

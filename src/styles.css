@@ -173,3 +173,19 @@ footer p { margin: 6px 0; }
 .stepnav a.active .stepnum { background: var(--accent); border-color: var(--accent); color: #fff; }
 .navsep { width: 1px; height: 18px; background: var(--line); margin: 0 4px; }
 @media (max-width: 720px) { .stepnav { gap: 14px; } .navsep { display: none; } }
+
+/* Pippa is thinking */
+.thinking { margin: 24px 0; padding: 20px 22px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); }
+.thinking-head { display: flex; align-items: center; gap: 12px; }
+.thinking-head strong { flex: 1; }
+.spinner { width: 20px; height: 20px; border-radius: 50%; border: 2.5px solid var(--accent-soft); border-top-color: var(--accent); animation: spin 0.9s linear infinite; flex: none; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.thinking-steps { list-style: none; padding: 0; margin: 14px 0 10px; }
+.thinking-steps li { padding: 3px 0 3px 26px; position: relative; color: var(--muted); font-size: 0.92rem; }
+.thinking-steps li::before { content: ""; position: absolute; left: 6px; top: 10px; width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid var(--line); }
+.thinking-steps li.done { color: var(--ink); }
+.thinking-steps li.done::before { background: var(--accent); border-color: var(--accent); }
+.thinking-steps li.now { color: var(--ink); font-weight: 600; }
+.thinking-steps li.now::before { border-color: var(--accent); animation: pulse 1.2s ease-in-out infinite; }
+@keyframes pulse { 50% { background: var(--accent-soft); } }
+@media (prefers-reduced-motion: reduce) { .spinner, .thinking-steps li.now::before { animation: none; } }
