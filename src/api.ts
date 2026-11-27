@@ -31,6 +31,8 @@ export const api = {
   run: (id: string) => call<RunRecord>(`/api/runs/${id}`),
   deleteRun: (id: string) => call<{ ok: true }>(`/api/runs/${id}`, { method: "DELETE" }),
   clarify: (req: AnalyzeRequest) => call<ClarifyResult>("/api/clarify", { method: "POST", body: JSON.stringify(req) }),
+  ask: (runId: string, messages: { role: "user" | "assistant"; content: string }[]) =>
+    call<{ answer: string }>("/api/ask", { method: "POST", body: JSON.stringify({ runId, messages }) }),
   analyze: (req: AnalyzeRequest) =>
     call<{ id: string; title: string; output: FunderResult | ResourcesResult }>("/api/analyze", { method: "POST", body: JSON.stringify(req) }),
 };

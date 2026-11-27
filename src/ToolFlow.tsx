@@ -5,7 +5,7 @@ import AutoText from "./AutoText";
 import { normalizeClarify } from "../shared/normalize";
 import Thinking from "./Thinking";
 import { ACCEPT, MAX_TOTAL_MB, readFile, totalSizeMB } from "./files";
-import { FunderCard, ResourcesCard } from "./Results";
+import { ResultView } from "./Results";
 
 const FORMS = ["Grant", "In-kind", "Corporate partnership", "Loan", "Recoverable grant", "Investment", "Matching funds"];
 
@@ -124,7 +124,7 @@ export default function ToolFlow({ tool, cases }: { tool: Tool; cases: CaseRecor
           </button>
           <a href="#/saved">Saved analyses</a>
         </div>
-        {tool === "funder" ? <FunderCard r={result.output as FunderResult} /> : <ResourcesCard r={result.output as ResourcesResult} />}
+        <ResultView tool={tool} output={result.output} runId={result.id} />
       </section>
     );
   }

@@ -51,6 +51,10 @@ export function Privacy() {
         </li>
       </ul>
       <p>
+        <strong>Ask Pippa conversations are not stored.</strong> Your questions are sent to our AI provider with the analysis they're about, and
+        disappear when you leave the page.
+      </p>
+      <p>
         <strong>Files you upload are not stored by Pippa.</strong> They are read in your browser or sent once to our AI provider for the
         analysis you asked for. Only the result is saved.
       </p>

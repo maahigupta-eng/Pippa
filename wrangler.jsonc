@@ -27,6 +27,7 @@
   "vars": {
     "MODEL": "claude-sonnet-5-5",
     "DAILY_RUN_LIMIT": "15",
+    "DAILY_CHAT_LIMIT": "40",
     // From Cloudflare Zero Trust: your team domain and the Access app's AUD tag.
     "ACCESS_TEAM_DOMAIN": "https://restless-thunder-4a00.cloudflareaccess.com",
     "ACCESS_AUD": "b230821a0b8d67ff75ac5b91b2b8b0b3d16151457864d951404964ce0c81992e",

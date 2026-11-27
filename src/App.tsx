@@ -5,7 +5,7 @@ import CaseView from "./CaseView";
 import ToolFlow from "./ToolFlow";
 import About from "./About";
 import { ConsentGate, Privacy, Terms } from "./Legal";
-import { FunderCard, ResourcesCard } from "./Results";
+import { ResultView } from "./Results";
 import { SITE } from "./config";
 import ErrorBoundary from "./ErrorBoundary";
 
@@ -226,7 +226,7 @@ function RunView({ id }: { id: string }) {
         <a href="#/saved">← Saved analyses</a>
         <button onClick={() => window.print()}>Print or save as PDF</button>
       </div>
-      {run.tool === "funder" ? <FunderCard r={run.output as never} /> : <ResourcesCard r={run.output as never} />}
+      <ResultView tool={run.tool} output={run.output} runId={run.id} />
     </section>
   );
 }

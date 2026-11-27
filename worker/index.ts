@@ -9,6 +9,7 @@ export interface Env {
   ANTHROPIC_API_KEY: string;
   MODEL: string;
   DAILY_RUN_LIMIT: string;
+  DAILY_CHAT_LIMIT?: string;
   ACCESS_TEAM_DOMAIN: string;
   ACCESS_AUD: string;
   ADMIN_EMAILS: string;
@@ -41,9 +42,10 @@ async function getEmail(req: Request, env: Env): Promise<string | null> {
 
 // ---------- Daily cap ----------
 
-async function takeQuota(env: Env, email: string): Promise<boolean> {
-  const limit = Number(env.DAILY_RUN_LIMIT || "15");
-  const day = new Date().toISOString().slice(0, 10);
+async function takeQuota(env: Env, email: string, kind: "run" | "chat" = "run"): Promise<boolean> {
+  const limit = kind === "chat" ? Number(env.DAILY_CHAT_LIMIT || "40") : Number(env.DAILY_RUN_LIMIT || "15");
+  const today = new Date().toISOString().slice(0, 10);
+  const day = kind === "chat" ? `${today}:chat` : today;
   const row = await env.DB.prepare(
     `INSERT INTO usage (email, day, calls) VALUES (?1, ?2, 1)
      ON CONFLICT(email, day) DO UPDATE SET calls = calls + 1
@@ -249,6 +251,54 @@ async function handleApi(req: Request, env: Env, url: URL): Promise<Response> {
   if (runMatch && method === "DELETE") {
     await env.DB.prepare("DELETE FROM runs WHERE id = ?1 AND email = ?2").bind(runMatch[1], email).run();
     return json({ ok: true });
+  }
+
+  // Ask Pippa: follow-up questions about one saved analysis
+  if (path === "/api/ask" && method === "POST") {
+    if (!(await hasAccepted(env, email))) return fail(403, "Please accept the Terms of Use and Privacy Notice first (reload the page).");
+    const body = (await req.json().catch(() => null)) as { runId?: string; messages?: { role: string; content: string }[] } | null;
+    if (!body?.runId || !Array.isArray(body.messages) || body.messages.length === 0) return fail(400, "Ask a question first.");
+    const run = await env.DB.prepare("SELECT tool, title, need, output FROM runs WHERE id = ?1 AND email = ?2")
+      .bind(body.runId, email).first<{ tool: Tool; title: string; need: string; output: string }>();
+    if (!run) return fail(404, "Couldn't find that analysis.");
+    if (!(await takeQuota(env, email, "chat"))) return fail(429, "You've reached today's limit for Ask Pippa. It resets at midnight UTC.");
+
+    const history = body.messages
+      .filter((m) => (m.role === "user" || m.role === "assistant") && typeof m.content === "string" && m.content.trim())
+      .slice(-10)
+      .map((m) => ({ role: m.role as "user" | "assistant", content: m.content.slice(0, 2000) }));
+    if (history[0]?.role !== "user") history.shift();
+    if (!history.length) return fail(400, "Ask a question first.");
+
+    const system = `${systemPrompt(run.tool)}
+
+---
+
+MODE: FOLLOW-UP QUESTIONS. The analysis below is finished. The user is asking about it.
+- Answer in plain, warm, short language: at most 120 words. Bullets only for lists of 3 or more.
+- Ground answers in the analysis and the user's stated need and answers. You no longer have the original documents; if a question needs them, say so and suggest what to check.
+- You may explain terms, reasoning and ratings, suggest how to explain or pitch something, or help the user decide what to do first.
+- Never invent facts, figures or funder details. Never write a full proposal; short talking points are fine.
+
+THE ANALYSIS (${run.title}):
+${run.output}
+
+WHAT THE USER TOLD PIPPA:
+${run.need}`;
+
+    const res = await fetch(env.ANTHROPIC_URL || "https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "content-type": "application/json", "x-api-key": env.ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01" },
+      body: JSON.stringify({ model: env.MODEL, max_tokens: 4000, system, messages: history }),
+    });
+    if (!res.ok) {
+      const detail = await res.text();
+      console.error("Anthropic error (ask)", res.status, detail.slice(0, 1000));
+      return fail(502, explainAnthropicError(res.status, detail, env.MODEL));
+    }
+    const out = (await res.json()) as { content: { type: string; text?: string }[] };
+    const answer = out.content.filter((c) => c.type === "text").map((c) => c.text ?? "").join("\n").trim();
+    return json({ answer: answer || "Sorry, I couldn't come up with an answer. Try asking another way." });
   }
 
   // AI: clarify, then analyze

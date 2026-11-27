@@ -77,6 +77,7 @@ Donors skim, and so do national directors.
 - Bullets over blocks. Say it once.
 - No jargon unless the user used it first. No hype words (game-changing, transformative, unlock, leverage as a verb, synergy).
 - Clear beats clever. Short does not mean shallow.
+- Results appear on screen as boxed sections, read by busy managers who are not technical. Keep every field within its word limit. Never repeat the same point in two fields. Leave out anything the reader can safely ignore.
 
 ## Rules of restraint
 
