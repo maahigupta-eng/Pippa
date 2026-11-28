@@ -118,6 +118,36 @@
     });
   }
 
+
+  /* Hero: what Pippa finds, cycling through examples */
+  const rf = document.getElementById("reframe");
+  if (rf) {
+    const EX = [
+      { src: "Your asset register", k: "From your register", input: "A hall, used two days a month", mark: "A training venue a partner could fund.", rest: " About USD 12,000 a year." },
+      { src: "Your lab schedule", k: "From your schedule", input: "Lab time, free at weekends", mark: "Capacity an industry partner could fund and use.", rest: " A route to a co-funded project." },
+      { src: "Your staff list", k: "From your team", input: "A certified trainer on staff", mark: "A paid training service for partners.", rest: " Or co-financing in kind." },
+      { src: "Your CV", k: "From your CV", input: "Three years of fieldwork in Nairobi", mark: "The track record a regional fellowship asks for.", rest: " Lead with it." },
+    ];
+    const $ = (id) => document.getElementById(id);
+    const dots = [...rf.querySelectorAll(".rf-dots i")];
+    let i = 0;
+    const show = (n) => {
+      const e = EX[n];
+      rf.classList.add("swap");
+      setTimeout(() => {
+        $("rf-src").textContent = e.src; $("rf-k-in").textContent = e.k; $("rf-in").textContent = e.input;
+        $("rf-out").innerHTML = `<mark>${e.mark}</mark>${e.rest}`;
+        dots.forEach((d, j) => d.classList.toggle("on", j === n));
+        rf.classList.remove("swap");
+      }, reduced ? 0 : 450);
+    };
+    if (!reduced) {
+      let visible = true;
+      new IntersectionObserver(([en]) => { visible = en.isIntersecting; }).observe(rf);
+      setInterval(() => { if (visible && !document.hidden) { i = (i + 1) % EX.length; show(i); } }, 5200);
+    }
+  }
+
   /* Hero register */
   const rowsEl = document.getElementById("reg-rows");
   if (!rowsEl) return;

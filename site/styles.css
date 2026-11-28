@@ -118,6 +118,28 @@ p { margin: 0; }
 .register-note { margin-top: 12px; font-family: var(--serif); font-style: italic; font-size: .9rem; color: rgba(238, 241, 234, .5); }
 .register.resetting .register-rows, .register.resetting .tray-items { opacity: 0; transition: opacity .5s; }
 
+
+/* ---------------- Hero: what Pippa finds ---------------- */
+.reframe { position: relative; margin: 0; background: var(--ink); color: var(--paper); border-radius: 22px; padding: 26px; box-shadow: 0 30px 60px -28px rgba(20, 35, 31, .55); overflow: hidden; animation: lift 1s .25s var(--ease) both; font-family: var(--sans); }
+.reframe::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(420px 220px at 100% 0%, rgba(63, 122, 105, .45), transparent 70%); }
+.rf-head { position: relative; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.rf-title { font: 600 1.25rem var(--serif); }
+.rf-status { display: inline-flex; align-items: center; gap: 8px; font-size: .82rem; color: rgba(238, 241, 234, .7); }
+.rf-card { position: relative; border-radius: 16px; padding: 20px 22px; transition: opacity .45s var(--ease), transform .45s var(--ease); }
+.rf-in { background: rgba(238, 241, 234, .06); border: 1px solid rgba(238, 241, 234, .14); }
+.rf-out { background: var(--paper); color: var(--ink); transition-delay: .08s; }
+.rf-k { font-size: .78rem; font-weight: 500; color: rgba(238, 241, 234, .55); margin-bottom: 6px; }
+.rf-out .rf-k { color: var(--green); }
+.rf-text { font: 500 1.65rem/1.22 var(--serif); }
+.rf-out mark { background: linear-gradient(transparent 58%, var(--mark-soft) 58% 94%, transparent 94%) no-repeat; background-size: 100% 100%; color: inherit; animation: sweep 1s .5s var(--ease) both; }
+@keyframes sweep { from { background-size: 0 100%; } to { background-size: 100% 100%; } }
+.rf-arrow { position: relative; display: grid; place-items: center; height: 40px; color: var(--mark); }
+.rf-arrow svg { width: 22px; height: 22px; }
+.rf-dots { position: relative; display: flex; gap: 6px; margin-top: 20px; }
+.rf-dots i { width: 22px; height: 3px; border-radius: 2px; background: rgba(238, 241, 234, .22); transition: background .3s; }
+.rf-dots i.on { background: var(--mark); }
+.reframe.swap .rf-card { opacity: 0; transform: translateY(8px); }
+
 /* ---------------- Aid chart ---------------- */
 .aid { background: var(--ink); color: var(--paper); padding: clamp(72px, 9vw, 120px) 0; }
 .aid-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: clamp(36px, 5vw, 72px); align-items: center; }

@@ -175,12 +175,12 @@ HOME = f"""<section class="hero wrap">
     <p class="hero-sub" data-reveal>Pippa reads your registers, budgets and funder documents. It shows what you can bring to the table, which funders fit, and how to ask.</p>
     <div class="ctas" data-reveal><a class="btn btn-ink" href="{ACCESS}">Request access</a><a class="btn btn-line" href="/how">How it works</a></div>
   </div>
-  <figure class="register" aria-label="Pippa reading an asset register">
-    <div class="register-head"><span class="register-title">Asset register</span><span class="register-status" aria-live="polite"><span class="pulse" aria-hidden="true"></span><span id="reg-status">Reading line 1 of 9</span></span></div>
-    <div class="register-cols" aria-hidden="true"><span>Item</span><span>Recorded use</span><span class="num">Book value</span></div>
-    <ol class="register-rows" id="reg-rows"></ol>
-    <div class="register-tray"><div class="tray-head"><span>Found</span><span class="tray-total" id="reg-total">USD 0 a year</span></div><ul class="tray-items" id="reg-tray"></ul></div>
-    <figcaption class="register-note">Illustrative register. Pippa cites the line behind every finding.</figcaption>
+  <figure class="reframe" id="reframe" aria-label="Examples of what Pippa finds in your documents">
+    <div class="rf-head"><span class="rf-title">Pippa is reading</span><span class="rf-status"><span class="pulse" aria-hidden="true"></span><span id="rf-src">Your asset register</span></span></div>
+    <div class="rf-card rf-in"><p class="rf-k" id="rf-k-in">From your register</p><p class="rf-text" id="rf-in">A hall, used two days a month</p></div>
+    <div class="rf-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 4v15M6 13l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="rf-card rf-out"><p class="rf-k">Pippa finds</p><p class="rf-text" id="rf-out"><mark>A training venue a partner could fund.</mark> About USD 12,000 a year.</p></div>
+    <div class="rf-dots" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i></div>
   </figure>
 </section>
 
@@ -278,12 +278,12 @@ HOW = f"""<section class="page-head wrap">
 </section>
 <section class="kinds-band">
   <div class="wrap">
-    <div class="block-head" data-reveal><h2>What Pippa recognises.</h2><p>You know what you hold. Pippa shows how a funder might value it.</p></div>
+    <div class="block-head" data-reveal><h2>What Pippa recognises.</h2><p>Four kinds of resource, each framed the way a funder would value it.</p></div>
     <div class="kinds">
-      <div data-reveal><b>Human</b><p class="see"><span>You see</span>A trainer on staff</p><p class="sees"><span>A funder sees</span>A service partners would pay for, or count as co-financing</p></div>
-      <div data-reveal><b>Material</b><p class="see"><span>You see</span>A hall used twice a month</p><p class="sees"><span>A funder sees</span>A venue to share, rent or offer in kind</p></div>
-      <div data-reveal><b>Project</b><p class="see"><span>You see</span>A lab idle at weekends</p><p class="sees"><span>A funder sees</span>Capacity a partner could fund and use</p></div>
-      <div data-reveal><b>Saving</b><p class="see"><span>You see</span>Transport costs you share</p><p class="sees"><span>A funder sees</span>Money freed for the project, and a partner with a stake</p></div>
+      <div data-reveal><b>Human</b><p class="see"><span>In your documents</span>A trainer on staff</p><p class="sees"><span>Pippa frames it as</span>A service partners would pay for, or count as co-financing</p></div>
+      <div data-reveal><b>Material</b><p class="see"><span>In your documents</span>A hall used twice a month</p><p class="sees"><span>Pippa frames it as</span>A venue to share, rent or offer in kind</p></div>
+      <div data-reveal><b>Project</b><p class="see"><span>In your documents</span>A lab idle at weekends</p><p class="sees"><span>Pippa frames it as</span>Capacity a partner could fund and use</p></div>
+      <div data-reveal><b>Saving</b><p class="see"><span>In your documents</span>Transport costs you share</p><p class="sees"><span>Pippa frames it as</span>Money freed for the project, and a partner with a stake</p></div>
     </div>
   </div>
 </section>"""
