@@ -10,13 +10,13 @@ const FIT_LABEL: Record<string, string> = { strong: "Strong fit", good: "Good fi
 export function SearchCard({ r }: { r: SearchResult }) {
   return (
     <div className="result search-result">
-      <header className="online-hero">
+      <header className="online-hero" data-jump="Summary">
         <p className="eyebrow">Pippa Online{r.searched_on ? ` · searched ${r.searched_on}` : ""}</p>
         <h2>{r.leads.length ? `${r.leads.length} open calls worth a look` : "No strong matches found"}</h2>
         {r.summary && <p className="lead">{r.summary}</p>}
       </header>
 
-      <ol className="leads">
+      <ol className="leads" data-jump="Leads">
         {r.leads.map((l, i) => (
           <li key={i} className={`lead-card fit-${l.fit}`}>
             <div className="lead-top">
@@ -58,7 +58,7 @@ export function SearchCard({ r }: { r: SearchResult }) {
       </ol>
 
       {r.where_else.length > 0 && (
-        <section className="box blue">
+        <section className="box blue" data-jump="Also check">
           <h3>Also worth checking</h3>
           <ul>
             {r.where_else.map((w, i) => (
@@ -69,7 +69,7 @@ export function SearchCard({ r }: { r: SearchResult }) {
       )}
 
       {r.next_step.action && (
-        <section className="nextstep">
+        <section className="nextstep" data-jump="Pippa suggests">
           <div className="nextstep-main">
             <p className="nextstep-label">Pippa suggests</p>
             <p className="nextstep-action">{r.next_step.action}</p>

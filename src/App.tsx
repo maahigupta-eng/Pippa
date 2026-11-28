@@ -61,6 +61,17 @@ export default function App() {
     return () => window.removeEventListener("hashchange", onHash);
   }, []);
 
+  // Sticky elements (the results jump bar) sit just under the header; keep its height in a CSS variable.
+  useEffect(() => {
+    const set = () => {
+      const h = document.querySelector(".top")?.getBoundingClientRect().height ?? 0;
+      document.documentElement.style.setProperty("--top-h", `${Math.round(h)}px`);
+    };
+    set();
+    window.addEventListener("resize", set);
+    return () => window.removeEventListener("resize", set);
+  }, [online]);
+
   const refreshCases = useCallback(() => api.cases().then(setCases).catch(() => {}), []);
 
   useEffect(() => {

@@ -27,7 +27,7 @@ export default function About() {
       <section className="about-principles">
         {PRINCIPLES.map((p) => (
           <div key={p.k} className="principle">
-            <h3>{p.k}</h3>
+            <h2>{p.k}</h2>
             <p>{p.t}</p>
           </div>
         ))}

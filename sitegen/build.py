@@ -269,6 +269,7 @@ HOW = f"""<section class="page-head wrap">
   <p class="page-lede" data-reveal>Pippa reads what you bring, weighs it against what funders look for, and returns a short, sourced brief. You stay in charge of every decision.</p>
 </section>
 <section class="wrap block">
+  <h2 class="sr-only">The four tools</h2>
   <div class="tool-list">
     <article data-reveal><span class="tool-n">1</span><div><p class="tool-k">Frame the case</p><h3>Your case</h3><p>A structured brief on who you are, what you want to change and what you need. Every analysis reads from it, so the advice fits an organisation, a research group or a single applicant.</p><dl class="gg"><div><dt>You give</dt><dd>A few short answers</dd></div><div><dt>You get</dt><dd>Advice fitted to you</dd></div></dl></div></article>
     <article data-reveal><span class="tool-n">2</span><div><p class="tool-k">Look inward first</p><h3>Internal resources</h3><p>Registers, budgets and reports, read for capacity that is idle, underused or shareable. Each opportunity is weighed for mission risk, effort and confidence.</p><dl class="gg"><div><dt>You give</dt><dd>A register, budget or CV</dd></div><div><dt>You get</dt><dd>Ranked opportunities, with sources</dd></div></dl></div></article>

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { persona } from "../shared/personas";
 import type { AnalyzeRequest, Answer, CaseRecord, ClarifyResult, FileRole, FunderResult, Need, ResourcesResult, Tool, UploadedFile } from "../shared/types";
 import { api } from "./api";
 import AutoText from "./AutoText";
@@ -12,7 +13,7 @@ const FORMS = ["Grant", "In-kind", "Corporate partnership", "Loan", "Recoverable
 const COPY: Record<Tool, { title: string; lead: string; needHint: string; slots: { role: FileRole; label: string; hint: string[] }[] }> = {
   resources: {
     title: "Internal Resource Finder",
-    lead: "Look inward first. Pippa reads your own organisation's records for idle or underused capacity that could fund the work, cut the external ask, or count as co-financing.",
+    lead: "Look inward first. Pippa reads what you already hold for capacity that could fund the work, cut the external ask, or count as co-financing.",
     needHint: "What you're trying to fund or launch, and what would solve it: cash, space, equipment, staff time, a revenue stream.",
     slots: [
       {
@@ -57,6 +58,7 @@ export default function ToolFlow({ tool, cases }: { tool: Tool; cases: CaseRecor
   const [reading, setReading] = useState(false);
 
   const effectiveCase = caseId === "none" ? undefined : caseId || cases[0]?.id || undefined;
+  const who = persona(cases.find((c) => c.id === effectiveCase)?.profile.who);
 
   const request = (withAnswers?: Answer[]): AnalyzeRequest => ({ tool, caseId: effectiveCase, need, files, pasted, answers: withAnswers });
 
@@ -163,7 +165,7 @@ export default function ToolFlow({ tool, cases }: { tool: Tool; cases: CaseRecor
           </label>
           <label className="field">
             <span>Amount or range</span>
-            <AutoText value={need.amount} placeholder="e.g. €80,000 covers one site; €200,000 covers all four" onChange={(v) => setNeed({ ...need, amount: v })} />
+            <AutoText value={need.amount} placeholder={who.amountHint} onChange={(v) => setNeed({ ...need, amount: v })} />
           </label>
           <div className="field">
             <span>Support you can accept</span>
@@ -189,7 +191,7 @@ export default function ToolFlow({ tool, cases }: { tool: Tool; cases: CaseRecor
             <div key={slot.role}>
               <h2>{slot.label}</h2>
               <ul className="hint">
-                {slot.hint.map((h) => (
+                {(slot.role === "internal" ? who.internalHint : slot.hint).map((h) => (
                   <li key={h}>{h}</li>
                 ))}
               </ul>

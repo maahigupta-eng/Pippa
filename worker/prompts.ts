@@ -11,10 +11,7 @@ export function caseLines(kase: CaseRecord | null): string[] {
     `Who is asking: ${p.label} (${p.blurb})`,
     `Why they're here: ${kase.profile.purpose || "not given"}`,
     ...(["office", "programmes", "served", "scale"] as const).map((k) => `${p.fields[k][0]}: ${kase.profile[k] || "not given"}`),
-    `Problem statement: ${kase.challenge.problem || "not given"}`,
-    `Mission statement: ${kase.challenge.mission || "not given"}`,
-    `Stakeholders: ${kase.challenge.stakeholders || "not given"}`,
-    `Value proposition: ${kase.challenge.value || "not given"}`,
+    ...(["problem", "mission", "stakeholders", "value"] as const).map((k) => `${p.challenge[k][0]}: ${kase.challenge[k] || "not given"}`),
     "",
   ];
 }
