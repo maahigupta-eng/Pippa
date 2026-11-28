@@ -7,9 +7,18 @@
 <meta name="description" content="Request access to the Pippa pilot." />
 <meta property="og:title" content="Request access · Pippa" />
 <meta property="og:description" content="Request access to the Pippa pilot." />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Pippa" />
+<meta property="og:url" content="https://pippa-site.maahigupta.workers.dev/access" />
+<meta property="og:image" content="https://pippa-site.maahigupta.workers.dev/og.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://pippa-site.maahigupta.workers.dev/og.png" />
 <meta name="theme-color" content="#14231F" />
 <script>document.documentElement.classList.add("js")</script>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 <link rel="preload" href="/fonts/eb-garamond-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
 <link rel="preload" href="/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
 <link rel="stylesheet" href="/styles.css" />
@@ -29,11 +38,16 @@
   </div>
 </header>
 <main id="main">
-<section class="page-head wrap narrow">
-  <h1 class="split">Request access</h1>
-  <p class="page-lede" data-reveal>Pippa is in a closed pilot. Tell us a little about yourself and we'll be in touch.</p>
-</section>
-<section class="wrap block narrow">
+<section class="wrap access">
+  <div class="access-intro">
+    <h1 class="split">Request access</h1>
+    <p class="page-lede" data-reveal>Pippa is in early access. Tell us about your case and we'll review it and be in touch.</p>
+    <ol class="next-steps">
+      <li data-reveal><span>1</span><div><b>We read your note</b><p>Who you are, and what you're raising funds for.</p></div></li>
+      <li data-reveal><span>2</span><div><b>We set you up</b><p>If Pippa fits, we add your email and send you a link to sign in.</p></div></li>
+      <li data-reveal><span>3</span><div><b>You start with your case</b><p>Set out your case and run your first analysis in minutes.</p></div></li>
+    </ol>
+  </div>
   <form class="access-form" id="access-form" action="https://api.web3forms.com/submit" method="POST" data-key="WEB3FORMS_KEY" data-reveal>
     <input type="hidden" name="access_key" value="WEB3FORMS_KEY" />
     <input type="hidden" name="subject" value="Pippa access request" />
@@ -45,9 +59,9 @@
     </div>
     <label><span>Organisation or institution</span><input name="organisation" autocomplete="organization" /></label>
     <fieldset><legend>You are</legend><div class="radio-row"><label class="pick"><input type="radio" name="who" value="An organisation" required /><span>An organisation</span></label><label class="pick"><input type="radio" name="who" value="A researcher or academic" required /><span>A researcher or academic</span></label><label class="pick"><input type="radio" name="who" value="A student" required /><span>A student</span></label><label class="pick"><input type="radio" name="who" value="A social entrepreneur" required /><span>A social entrepreneur</span></label><label class="pick"><input type="radio" name="who" value="An individual with a cause" required /><span>An individual with a cause</span></label></div></fieldset>
-    <label><span>What are you raising money for?</span><textarea name="message" rows="4" required placeholder="A line or two is plenty."></textarea></label>
+    <label><span>What are you raising funds for?</span><textarea name="message" rows="4" required placeholder="A line or two is plenty."></textarea></label>
     <button class="btn btn-ink" type="submit">Send request</button>
-    <p class="form-note" id="form-note" role="status" aria-live="polite">We'll only use these details to reply to you. <a href="/privacy">Privacy</a></p>
+    <p class="form-note" id="form-note" role="status" aria-live="polite">We only use these details to reply to you. <a href="/privacy">Privacy</a></p>
   </form>
 </section>
 <div class="wrap next-wrap"></div>
