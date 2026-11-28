@@ -173,18 +173,47 @@ HOME = f"""<section class="hero wrap">
   </figure>
 </section>
 
-{CHART}
-
-<section class="wrap block">
-  <div class="block-head" data-reveal>
-    <h2>Three moves, in order.</h2>
-    <p>The same order good fundraisers already work in. Pippa does the reading.</p>
+<section class="route">
+  <div class="wrap">
+    <div class="block-head route-head" data-reveal>
+      <h2>From case to ask.</h2>
+      <p>The order good fundraisers already work in. You bring the documents. Pippa does the reading.</p>
+    </div>
+    <ol class="route-steps">
+      <li class="rstep" data-reveal>
+        <div class="vig vig-case" aria-hidden="true">
+          <p class="vig-k">Who are you?</p>
+          <div class="vig-chips"><span class="on">Organisation</span><span>Researcher</span><span>Student</span></div>
+          <p class="vig-k">The problem</p>
+          <p class="vig-type"><span>Classrooms at twice capacity in Kumasi</span></p>
+          <p class="vig-k">The ask</p>
+          <p class="vig-type d2"><span>USD 120,000 to 180,000</span></p>
+        </div>
+        <div class="rstep-body"><span class="rstep-n">1</span><div><h3>Frame the case</h3><p>Who you are, the problem, and why your approach works. Pippa tailors everything after to it.</p></div></div>
+      </li>
+      <li class="rstep" data-reveal>
+        <div class="vig vig-in" aria-hidden="true">
+          <div class="vig-row hl"><span>Hall, 120 seats</span><em>2 days a month</em></div>
+          <div class="vig-row flag"><span>Dental chair</span><em>Restricted</em></div>
+          <div class="vig-row hl d2"><span>Carpentry workshop</span><em>Closed since 2023</em></div>
+          <div class="vig-total"><span>Found</span><b>USD 30,500 a year</b></div>
+        </div>
+        <div class="rstep-body"><span class="rstep-n">2</span><div><h3>Look inward</h3><p>Space, equipment, skills and money you're not using. And what must stay untouched.</p></div></div>
+      </li>
+      <li class="rstep" data-reveal>
+        <div class="vig vig-out" aria-hidden="true">
+          <div class="vig-funder">
+            <svg class="ring" viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" class="ring-bg"/><circle cx="22" cy="22" r="18" class="ring-fg"/></svg>
+            <div><p class="vig-name">Harbourline Foundation</p><p class="vig-fit">Fit 78 of 100</p></div>
+          </div>
+          <p class="vig-verdict">Pursue narrowly</p>
+          <p class="vig-k">Route in</p>
+          <p class="vig-line">Youth skills window, with the workshop as co-financing</p>
+        </div>
+        <div class="rstep-body"><span class="rstep-n">3</span><div><h3>Look outward</h3><p>Which funders fit, the best route in, and what you can offer them in return.</p></div></div>
+      </li>
+    </ol>
   </div>
-  <ol class="moves">
-    <li data-reveal><span class="move-n">1</span><h3>Frame the case</h3><p>The problem, the mission, who's involved, and why your approach works.</p></li>
-    <li data-reveal><span class="move-n">2</span><h3>Look inward</h3><p>Buildings, equipment, staff time and money you're not using. And what must stay untouched.</p></li>
-    <li data-reveal><span class="move-n">3</span><h3>Look outward</h3><p>Which funders fit, the best route in, and what you can offer them.</p></li>
-  </ol>
 </section>
 
 <section class="results">
@@ -244,7 +273,7 @@ TOOLS = f"""<section class="page-head wrap">
 </section>
 <section class="wrap block">
   <div class="tool-list">
-    <article data-reveal><span class="tool-n">1</span><h3>Your case</h3><p>Set out the problem, the mission and the people involved once. Pippa reads it before every analysis.</p></article>
+    <article data-reveal><span class="tool-n">1</span><h3>Your case</h3><p>Say who you are, what you need, and the problem you're solving. Pippa tailors every analysis to it.</p></article>
     <article data-reveal><span class="tool-n">2</span><h3>Internal resources</h3><p>Upload an asset register, budget or programme report. Pippa finds what's sitting unused and ranks it by risk, effort and confidence.</p></article>
     <article data-reveal><span class="tool-n">3</span><h3>Funder check</h3><p>Add a funder's own materials. Pippa checks eligibility, scores the fit, names the route in, and says what you can offer.</p></article>
     <article data-reveal><span class="tool-n">+</span><h3>Ask Pippa</h3><p>Questions about a result? Ask. Answers stay grounded in your documents.</p></article>
@@ -290,11 +319,12 @@ ICON_DOC = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l4 4v14H6
 ICON_HAND = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16v11H4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="m4 8 8 6 8-6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>'
 
 FAQS = [
-    ("Who is Pippa for?", "People who raise money and build partnerships for non-profits and social organisations: directors, fundraising leads, partnership teams."),
-    ("What do I need to start?", "Your case, and whatever documents you have: an asset register, a budget, a programme report, or a funder's own materials."),
-    ("Does Pippa write the proposal?", "Pippa prepares the ground: what you can offer, which funders fit, and how to frame the ask. The proposal stays yours."),
-    ("What happens to my documents?", "Uploaded files are read once and not kept. Results are saved to your account so you can come back to them, and you can delete them at any time. Nothing you share is used to train AI models."),
-    ("Can Pippa be wrong?", "Yes. It works only from what you give it, cites where each finding came from, and lists what's missing. Check before you act."),
+    ("Who is Pippa for?", "Organisations and individuals looking for resources for a cause. That includes non-profits and programme teams, social entrepreneurs, and researchers or students applying for grants, fellowships and scholarships."),
+    ("What does Pippa help with?", "Three things. It finds resources you already have and can use or offer. It assesses whether a funder is worth your time and how to approach them. And it helps you frame the ask: how much, in what form, and what the funder gains."),
+    ("What do I need to get started?", "A short description of your case, and whatever documents you have. For organisations, that might be an asset register, a budget or a programme report. For individuals, a CV, a project outline or a call for applications. Add a funder's own guidelines to check your fit."),
+    ("Does Pippa find funders for me?", "Pippa assesses the funders you bring to it in depth, and tells you which kinds of funder suit your case and where to look next."),
+    ("How is my information handled?", "Uploaded files are read for your analysis and are not kept. Results are saved to your account so you can return to them, and you can delete them at any time. Nothing you share is used to train AI models."),
+    ("How do I get access?", "Pippa is in a closed pilot. Write to us with a line about who you are and what you're raising money for, and we'll set you up."),
 ]
 
 CONTACT = f"""<section class="faq wrap">

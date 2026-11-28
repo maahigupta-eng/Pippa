@@ -411,3 +411,11 @@ footer p { margin: 6px 0; }
 .contact-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--line); color: var(--ink); text-decoration: none; font-weight: 500; transition: background 0.15s, border-color 0.15s; word-break: break-all; }
 .tone-green .contact-btn:hover { background: #e9f4ee; border-color: #2f7a4f; }
 .tone-blue .contact-btn:hover { background: #eaf1f9; border-color: #2c5b8a; }
+
+/* Who are you? (Your case) */
+.persona-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; margin-bottom: 8px; }
+.persona { text-align: left; display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; border: 1.5px solid var(--line); border-radius: 12px; background: var(--card); cursor: pointer; font: inherit; color: inherit; transition: border-color .15s, box-shadow .15s; }
+.persona b { font-size: 1rem; }
+.persona span { font-size: .85rem; color: var(--muted, #5a6964); line-height: 1.35; }
+.persona:hover { border-color: var(--accent); }
+.persona.on { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent); }

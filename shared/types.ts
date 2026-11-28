@@ -22,6 +22,10 @@ export interface Need {
 }
 
 export interface CaseProfile {
+  /** Who is using Pippa (see shared/personas.ts). Older cases have none and read as an organisation. */
+  who?: string;
+  /** Why they're here, e.g. "Research funding". */
+  purpose?: string;
   office: string;
   programmes: string;
   served: string;

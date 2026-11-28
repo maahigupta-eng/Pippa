@@ -2,16 +2,12 @@ import { useEffect, useState } from "react";
 import type { CaseChallenge, CaseProfile, CaseRecord } from "../shared/types";
 import { api } from "./api";
 import AutoText from "./AutoText";
+import { PERSONAS, PURPOSES, persona } from "../shared/personas";
 
 const EMPTY_PROFILE: CaseProfile = { office: "", programmes: "", served: "", scale: "" };
 const EMPTY_CHALLENGE: CaseChallenge = { problem: "", mission: "", stakeholders: "", value: "" };
 
-const PROFILE_FIELDS: [keyof CaseProfile, string, string][] = [
-  ["office", "Office", "e.g. SOS Children's Villages Ghana, national office"],
-  ["programmes", "Programmes", "What you run: family strengthening, schools, clinics, youth employability…"],
-  ["served", "Who you serve", "Children, families, communities; roughly how many"],
-  ["scale", "Scale", "Annual budget, staff, number of sites"],
-];
+const PROFILE_KEYS = ["office", "programmes", "served", "scale"] as const;
 
 const CHALLENGE_FIELDS: [keyof CaseChallenge, string, string][] = [
   ["problem", "1. Problem statement", "What, specifically, are you trying to solve?"],
@@ -26,6 +22,7 @@ export default function CaseView({ cases, onSaved }: { cases: CaseRecord[]; onSa
   const [profile, setProfile] = useState<CaseProfile>(EMPTY_PROFILE);
   const [challenge, setChallenge] = useState<CaseChallenge>(EMPTY_CHALLENGE);
   const [status, setStatus] = useState<string | null>(null);
+  const who = persona(profile.who);
 
   useEffect(() => {
     if (current === "new" && cases.length && !title) setCurrent(cases[0].id);
@@ -56,8 +53,8 @@ export default function CaseView({ cases, onSaved }: { cases: CaseRecord[]; onSa
       <p className="eyebrow">Step 1</p>
       <h1>Your case</h1>
       <p className="lead">
-        Your group's case from the course: the four steps from Module 1. Everything after builds on it. Come back here whenever you want to
-        rethink the problem.
+        Tell Pippa who you are and what you need. Everything after builds on it, and Pippa tailors its advice to you. Come back whenever you
+        want to rethink the problem.
       </p>
 
       {cases.length > 0 && (
@@ -74,16 +71,49 @@ export default function CaseView({ cases, onSaved }: { cases: CaseRecord[]; onSa
         </label>
       )}
 
+      <h2>Who are you?</h2>
+      <div className="persona-grid" role="radiogroup" aria-label="Who are you?">
+        {PERSONAS.map((p) => (
+          <button
+            type="button"
+            key={p.key}
+            role="radio"
+            aria-checked={who.key === p.key}
+            className={"persona" + (who.key === p.key ? " on" : "")}
+            onClick={() => setProfile({ ...profile, who: p.key })}
+          >
+            <b>{p.label}</b>
+            <span>{p.blurb}</span>
+          </button>
+        ))}
+      </div>
+
+      <h2>What are you looking for?</h2>
+      <div className="chips" role="radiogroup" aria-label="What are you looking for?">
+        {PURPOSES.map((x) => (
+          <button
+            type="button"
+            key={x}
+            role="radio"
+            aria-checked={profile.purpose === x}
+            className={"chip" + (profile.purpose === x ? " on" : "")}
+            onClick={() => setProfile({ ...profile, purpose: x })}
+          >
+            {x}
+          </button>
+        ))}
+      </div>
+
       <label className="field">
         <span>Case title</span>
-        <AutoText value={title} onChange={setTitle} placeholder="e.g. Kumasi classroom block" />
+        <AutoText value={title} onChange={setTitle} placeholder={who.examples} />
       </label>
 
-      <h2>Your office</h2>
-      {PROFILE_FIELDS.map(([k, label, hint]) => (
+      <h2>{who.section}</h2>
+      {PROFILE_KEYS.map((k) => (
         <label className="field" key={k}>
-          <span>{label}</span>
-          <AutoText value={profile[k]} placeholder={hint} onChange={(v) => setProfile({ ...profile, [k]: v })} />
+          <span>{who.fields[k][0]}</span>
+          <AutoText value={profile[k]} placeholder={who.fields[k][1]} onChange={(v) => setProfile({ ...profile, [k]: v })} />
         </label>
       ))}
 

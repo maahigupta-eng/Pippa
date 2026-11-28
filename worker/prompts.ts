@@ -1,3 +1,4 @@
+import { persona } from "../shared/personas";
 import playbook from "./playbook.md";
 import type { AnalyzeRequest, CaseRecord, Tool } from "../shared/types";
 
@@ -56,11 +57,12 @@ export function userContent(req: AnalyzeRequest, kase: CaseRecord | null, phase:
   const lines: string[] = [];
   if (kase) {
     lines.push(
-      `THE CASE (set up by the user during the course): "${kase.title}"`,
-      `Office: ${kase.profile.office || "not given"}`,
-      `Programmes: ${kase.profile.programmes || "not given"}`,
-      `Who they serve: ${kase.profile.served || "not given"}`,
-      `Scale (budget, reach): ${kase.profile.scale || "not given"}`,
+      `THE CASE: "${kase.title}"`,
+      `Who is asking: ${persona(kase.profile.who).label} (${persona(kase.profile.who).blurb})`,
+      `Why they're here: ${kase.profile.purpose || "not given"}`,
+      ...(["office", "programmes", "served", "scale"] as const).map(
+        (k) => `${persona(kase.profile.who).fields[k][0]}: ${kase.profile[k] || "not given"}`,
+      ),
       `Problem statement: ${kase.challenge.problem || "not given"}`,
       `Mission statement: ${kase.challenge.mission || "not given"}`,
       `Stakeholders: ${kase.challenge.stakeholders || "not given"}`,
