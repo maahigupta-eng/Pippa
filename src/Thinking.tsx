@@ -3,11 +3,12 @@ import { useEffect, useState } from "react";
 const STEPS: Record<string, string[]> = {
   clarify: ["Reading your documents", "Checking them against your case", "Working out what's missing"],
   resources: ["Reading your documents", "Checking against your case and need", "Looking for idle or underused capacity", "Checking mission and safeguarding risks", "Writing it up"],
+  search: ["Reading your case", "Searching for open calls", "Checking deadlines and eligibility", "Weighing the fit for you", "Writing it up"],
   funder: ["Reading the funder's materials", "Checking eligibility", "Scoring material and symbolic fit", "Working out what you can offer them", "Writing it up"],
 };
 
 /** Shown while Pippa is working: a spinner, the current stage, and elapsed time. */
-export default function Thinking({ kind }: { kind: "clarify" | "resources" | "funder" }) {
+export default function Thinking({ kind }: { kind: "clarify" | "resources" | "funder" | "search" }) {
   const steps = STEPS[kind];
   const [seconds, setSeconds] = useState(0);
 
@@ -17,7 +18,7 @@ export default function Thinking({ kind }: { kind: "clarify" | "resources" | "fu
   }, []);
 
   // Move through the stages at a steady pace, then hold on the last one.
-  const index = Math.min(steps.length - 1, Math.floor(seconds / (kind === "clarify" ? 6 : 10)));
+  const index = Math.min(steps.length - 1, Math.floor(seconds / (kind === "clarify" ? 6 : kind === "search" ? 14 : 10)));
 
   return (
     <div className="thinking" role="status" aria-live="polite">
@@ -34,7 +35,7 @@ export default function Thinking({ kind }: { kind: "clarify" | "resources" | "fu
         ))}
       </ol>
       <p className="muted small">
-        {kind === "clarify" ? "Usually 15 to 40 seconds." : "Usually 30 to 90 seconds. Long documents take longer."} You can keep this tab open
+        {kind === "clarify" ? "Usually 15 to 40 seconds." : kind === "search" ? "Live search takes one to three minutes." : "Usually 30 to 90 seconds. Long documents take longer."} You can keep this tab open
         and come back.
       </p>
     </div>

@@ -4,6 +4,8 @@ import { api } from "./api";
 import CaseView from "./CaseView";
 import ToolFlow from "./ToolFlow";
 import About from "./About";
+import Online from "./Online";
+import { session } from "./session";
 import Contact from "./Contact";
 import { ConsentGate, Privacy, Terms } from "./Legal";
 import { ResultView } from "./Results";
@@ -19,7 +21,8 @@ type View =
   | { name: "about" }
   | { name: "privacy" }
   | { name: "terms" }
-  | { name: "contact" };
+  | { name: "contact" }
+  | { name: "online" };
 
 function readHash(): View {
   const h = location.hash.replace(/^#\/?/, "");
@@ -32,6 +35,7 @@ function readHash(): View {
   if (h === "privacy") return { name: "privacy" };
   if (h === "terms") return { name: "terms" };
   if (h === "contact") return { name: "contact" };
+  if (h === "online") return { name: "online" };
   return { name: "home" };
 }
 
@@ -46,6 +50,7 @@ export default function App() {
   const [accepted, setAccepted] = useState<boolean | null>(null);
   const [cases, setCases] = useState<CaseRecord[]>([]);
   const [authError, setAuthError] = useState<string | null>(null);
+  const [online, setOnline] = useState(false);
 
   useEffect(() => {
     const onHash = () => {
@@ -62,6 +67,8 @@ export default function App() {
     api
       .me()
       .then((m) => {
+        session.online = !!m.online;
+        setOnline(!!m.online);
         setEmail(m.email);
         setAccepted(m.accepted);
       })
@@ -76,6 +83,7 @@ export default function App() {
     ["funder", "3", "Funder check", view.name === "tool" && view.tool === "funder"],
   ];
   const more: [string, string, boolean][] = [
+    ...(online ? ([["online", "Online", view.name === "online"]] as [string, string, boolean][]) : []),
     ["saved", "Saved", view.name === "saved" || view.name === "run"],
     ["about", "About", view.name === "about"],
   ];
@@ -119,6 +127,7 @@ export default function App() {
         {view.name === "saved" && <Saved />}
         {view.name === "run" && <RunView id={view.id} />}
         {view.name === "about" && <About />}
+        {view.name === "online" && <Online cases={cases} />}
         {view.name === "privacy" && <Privacy />}
         {view.name === "terms" && <Terms />}
         {view.name === "contact" && <Contact />}

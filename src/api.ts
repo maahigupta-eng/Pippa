@@ -1,4 +1,4 @@
-import type { AnalyzeRequest, CaseRecord, ClarifyResult, FunderResult, ResourcesResult, RunRecord } from "../shared/types";
+import type { AnalyzeRequest, CaseRecord, ClarifyResult, FunderResult, ResourcesResult, RunRecord, SearchRequest, SearchResult } from "../shared/types";
 
 async function call<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(path, {
@@ -21,7 +21,8 @@ async function call<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export const api = {
-  me: () => call<{ email: string; admin: boolean; accepted: boolean; termsVersion: string }>("/api/me"),
+  me: () => call<{ email: string; admin: boolean; online?: boolean; accepted: boolean; termsVersion: string }>("/api/me"),
+  search: (b: SearchRequest) => call<{ id: string; title: string; output: SearchResult }>("/api/search", { method: "POST", body: JSON.stringify(b) }),
   consent: () => call<{ ok: true }>("/api/consent", { method: "POST" }),
   deleteMyData: () => call<{ ok: true }>("/api/me/data", { method: "DELETE" }),
   cases: () => call<CaseRecord[]>("/api/cases"),

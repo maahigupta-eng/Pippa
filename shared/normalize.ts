@@ -1,6 +1,6 @@
 // Make AI output safe to display, whatever shape it came back in.
 // Used by the Worker (before saving) and by the page (for older saved runs).
-import type { ClarifyResult, FunderResult, Level, Opportunity, ResourcesResult, Verdict } from "./types";
+import type { ClarifyResult, Fit, FunderResult, Level, Opportunity, ResourcesResult, SearchResult, Verdict } from "./types";
 
 type Obj = Record<string, unknown>;
 const isObj = (v: unknown): v is Obj => !!v && typeof v === "object" && !Array.isArray(v);
@@ -162,5 +162,42 @@ export function normalizeClarify(raw: unknown): ClarifyResult {
       .slice(0, 4),
     ready: r.ready === true,
     safeguarding_flag: str(r.safeguarding_flag),
+  };
+}
+
+const FITS: Fit[] = ["strong", "good", "stretch"];
+const safeUrl = (v: unknown): string => {
+  const u = str(v);
+  return /^https?:\/\//i.test(u) ? u : "";
+};
+
+export function normalizeSearch(raw: unknown, sources: { title: string; url: string }[] = [], searchedOn = ""): SearchResult {
+  const r = unwrap(raw, "leads");
+  const leads = (Array.isArray(r.leads) ? r.leads : [])
+    .map((x) => asObj(x))
+    .filter((x): x is Obj => !!x)
+    .map((l) => {
+      const fit = str(l.fit).toLowerCase() as Fit;
+      return {
+        title: str(l.title, "Untitled call"),
+        funder: str(l.funder, "Not stated"),
+        url: safeUrl(l.url),
+        deadline: str(l.deadline, "Not stated"),
+        amount: str(l.amount, "Not stated"),
+        eligibility: str(l.eligibility),
+        fit: FITS.includes(fit) ? fit : "good",
+        why_fit: str(l.why_fit),
+        angle: str(l.angle),
+        check_first: str(l.check_first),
+      };
+    })
+    .slice(0, 8);
+  return {
+    summary: str(r.summary),
+    leads,
+    where_else: list(r.where_else).slice(0, 4),
+    next_step: step(r),
+    searched_on: searchedOn,
+    sources: sources.filter((s) => /^https?:\/\//.test(s.url)).slice(0, 20),
   };
 }

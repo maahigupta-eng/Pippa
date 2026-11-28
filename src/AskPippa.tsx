@@ -4,7 +4,13 @@ import { api } from "./api";
 
 type Msg = { role: "user" | "assistant"; content: string; followups?: string[] };
 
-const SUGGESTIONS: Record<Tool, string[]> = {
+const SUGGESTIONS: Record<Tool | "search", string[]> = {
+  search: [
+    "Which of these should I apply to first?",
+    "How should I tailor my pitch for the top lead?",
+    "What would make me more competitive?",
+    "Draft an outline of what to say in the opening paragraph",
+  ],
   resources: [
     "Explain this in simpler words",
     "What should I do first?",
@@ -50,7 +56,7 @@ function Formatted({ text }: { text: string }) {
   return <>{blocks}</>;
 }
 
-export default function AskPippa({ runId, tool }: { runId: string; tool: Tool }) {
+export default function AskPippa({ runId, tool }: { runId: string; tool: Tool | "search" }) {
   const [open, setOpen] = useState(false);
   const [big, setBig] = useState(false);
   const [msgs, setMsgs] = useState<Msg[]>([]);

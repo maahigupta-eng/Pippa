@@ -2,6 +2,56 @@ import { persona } from "../shared/personas";
 import playbook from "./playbook.md";
 import type { AnalyzeRequest, CaseRecord, Tool } from "../shared/types";
 
+/** The user's case as plain lines, shared by every prompt. */
+export function caseLines(kase: CaseRecord | null): string[] {
+  if (!kase) return [];
+  const p = persona(kase.profile.who);
+  return [
+    `THE CASE: "${kase.title}"`,
+    `Who is asking: ${p.label} (${p.blurb})`,
+    `Why they're here: ${kase.profile.purpose || "not given"}`,
+    ...(["office", "programmes", "served", "scale"] as const).map((k) => `${p.fields[k][0]}: ${kase.profile[k] || "not given"}`),
+    `Problem statement: ${kase.challenge.problem || "not given"}`,
+    `Mission statement: ${kase.challenge.mission || "not given"}`,
+    `Stakeholders: ${kase.challenge.stakeholders || "not given"}`,
+    `Value proposition: ${kase.challenge.value || "not given"}`,
+    "",
+  ];
+}
+
+// ---------- Pippa Online: live search ----------
+
+export const SEARCH_BRIEF = `MODE: PIPPA ONLINE (live search)
+
+In this mode you may search the web. Use it to find funding opportunities that are open now or opening soon and that fit this user: grants, fellowships, scholarships, prizes, accelerators, research calls, in-kind programmes.
+
+How to search:
+- First, understand the case: who the user is, their field or topic, what the money is for, their geography and career or organisational stage. Build searches from that. For researchers and students, search by discipline, topic and career stage; include research councils, foundations, learned societies, university and regional schemes.
+- Prefer the funder's own pages over aggregators. Open the call page when you can.
+- Today's date is {TODAY}. Only include calls whose deadline is after today, or rolling, or opening soon. If you cannot confirm a deadline, say "Not stated".
+- Check hard eligibility against the case (nationality, career stage, organisation type, geography). Drop clear mismatches.
+
+What to return: 3 to 6 leads, best first. Be specific to this user: say what this funder wants from someone like them, and how they should position themselves. Apply the playbook: what the user can bring, the form of support, earmarking and reporting load, and mission drift.
+
+Never invent a funder, URL, amount or deadline. If a field isn't on the page, write "Not stated". The decision to apply is the user's: give them what they need to decide.
+
+Reply with only one JSON object, no prose before or after, in this shape:
+{"summary": "under 40 words",
+ "leads": [{"title": "name of the call", "funder": "who runs it", "url": "the call page", "deadline": "date or Rolling or Not stated", "amount": "range or Not stated", "eligibility": "who can apply, under 25 words", "fit": "strong | good | stretch", "why_fit": "under 30 words, tied to the case", "angle": "how this user should position, under 30 words", "check_first": "the one thing to confirm before applying, under 20 words"}],
+ "where_else": ["up to 3 other places worth checking, each under 15 words"],
+ "next_step": {"action": "one concrete next step, under 25 words", "owner": "You", "within": "a timeframe"}}`;
+
+export function searchContent(kase: CaseRecord | null, focus: string, region: string): string {
+  return [
+    ...caseLines(kase),
+    "WHAT TO SEARCH FOR",
+    `Focus: ${focus || "Use the case: the topic and what the money is for."}`,
+    `Geography: ${region || "Use the case."}`,
+    "",
+    "Search now, then reply with the JSON object only.",
+  ].join("\n");
+}
+
 // ---------- System prompts ----------
 
 const TOOL_BRIEF: Record<Tool, string> = {
@@ -54,22 +104,7 @@ export function userContent(req: AnalyzeRequest, kase: CaseRecord | null, phase:
     if (t) blocks.push({ type: "document", title: `${ROLE_LABEL[role]}: pasted text`, source: { type: "text", media_type: "text/plain", data: clip(t) } });
   }
 
-  const lines: string[] = [];
-  if (kase) {
-    lines.push(
-      `THE CASE: "${kase.title}"`,
-      `Who is asking: ${persona(kase.profile.who).label} (${persona(kase.profile.who).blurb})`,
-      `Why they're here: ${kase.profile.purpose || "not given"}`,
-      ...(["office", "programmes", "served", "scale"] as const).map(
-        (k) => `${persona(kase.profile.who).fields[k][0]}: ${kase.profile[k] || "not given"}`,
-      ),
-      `Problem statement: ${kase.challenge.problem || "not given"}`,
-      `Mission statement: ${kase.challenge.mission || "not given"}`,
-      `Stakeholders: ${kase.challenge.stakeholders || "not given"}`,
-      `Value proposition: ${kase.challenge.value || "not given"}`,
-      "",
-    );
-  }
+  const lines: string[] = [...caseLines(kase)];
   const n = req.need;
   lines.push(
     "WHAT THEY NEED RIGHT NOW",

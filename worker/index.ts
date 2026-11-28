@@ -1,7 +1,8 @@
 import { createRemoteJWKSet, jwtVerify } from "jose";
-import type { AnalyzeRequest, CaseRecord, Tool } from "../shared/types";
-import { normalizeClarify, normalizeFunder, normalizeResources } from "../shared/normalize";
-import { CLARIFY_TOOL, FUNDER_TOOL, RESOURCES_TOOL, systemPrompt, userContent } from "./prompts";
+import type { AnalyzeRequest, CaseRecord, SearchRequest, Tool } from "../shared/types";
+import { normalizeClarify, normalizeFunder, normalizeResources, normalizeSearch } from "../shared/normalize";
+import { CLARIFY_TOOL, FUNDER_TOOL, RESOURCES_TOOL, SEARCH_BRIEF, searchContent, systemPrompt, userContent } from "./prompts";
+import playbook from "./playbook.md";
 
 export interface Env {
   DB: D1Database;
@@ -13,6 +14,9 @@ export interface Env {
   ACCESS_TEAM_DOMAIN: string;
   ACCESS_AUD: string;
   ADMIN_EMAILS: string;
+  /** Comma-separated emails with Pippa Online (live search). Admins always have it. */
+  ONLINE_EMAILS?: string;
+  DAILY_SEARCH_LIMIT?: string;
   /** Local development only (set in .dev.vars). Skips Access when present. */
   DEV_EMAIL?: string;
   /** Local testing only: point at a mock server instead of api.anthropic.com. */
@@ -42,10 +46,11 @@ async function getEmail(req: Request, env: Env): Promise<string | null> {
 
 // ---------- Daily cap ----------
 
-async function takeQuota(env: Env, email: string, kind: "run" | "chat" = "run"): Promise<boolean> {
-  const limit = kind === "chat" ? Number(env.DAILY_CHAT_LIMIT || "40") : Number(env.DAILY_RUN_LIMIT || "15");
+async function takeQuota(env: Env, email: string, kind: "run" | "chat" | "search" = "run"): Promise<boolean> {
+  const limit =
+    kind === "chat" ? Number(env.DAILY_CHAT_LIMIT || "40") : kind === "search" ? Number(env.DAILY_SEARCH_LIMIT || "5") : Number(env.DAILY_RUN_LIMIT || "15");
   const today = new Date().toISOString().slice(0, 10);
-  const day = kind === "chat" ? `${today}:chat` : today;
+  const day = kind === "run" ? today : `${today}:${kind}`;
   const row = await env.DB.prepare(
     `INSERT INTO usage (email, day, calls) VALUES (?1, ?2, 1)
      ON CONFLICT(email, day) DO UPDATE SET calls = calls + 1
@@ -53,6 +58,12 @@ async function takeQuota(env: Env, email: string, kind: "run" | "chat" = "run"):
   ).bind(email, day).first<{ calls: number }>();
   return (row?.calls ?? 1) <= limit;
 }
+
+// ---------- Plans ----------
+
+const emailList = (v?: string) => (v || "").split(",").map((s) => s.trim().toLowerCase()).filter(Boolean);
+const isAdmin = (env: Env, email: string) => emailList(env.ADMIN_EMAILS).includes(email);
+const isOnline = (env: Env, email: string) => isAdmin(env, email) || emailList(env.ONLINE_EMAILS).includes(email);
 
 // ---------- Anthropic ----------
 
@@ -182,6 +193,42 @@ async function hasAccepted(env: Env, email: string): Promise<boolean> {
 
 // ---------- Routes ----------
 
+/** Pippa Online: let the model search the web, then return leads as JSON. */
+async function searchClaude(env: Env, kase: CaseRecord, body: SearchRequest) {
+  const today = new Date().toISOString().slice(0, 10);
+  const system = `${playbook}\n\n---\n\n${SEARCH_BRIEF.replace("{TODAY}", today)}`;
+  const messages: Message[] = [{ role: "user", content: searchContent(kase, body.focus?.trim() || "", body.region?.trim() || "") }];
+  const sources = new Map<string, string>();
+  let text = "";
+  for (let turn = 0; turn < 4; turn++) {
+    const res = await fetch(env.ANTHROPIC_URL || "https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "content-type": "application/json", "x-api-key": env.ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01" },
+      body: JSON.stringify({
+        model: env.MODEL,
+        max_tokens: 6000,
+        system,
+        messages,
+        tools: [{ type: "web_search_20250305", name: "web_search", max_uses: 8 }],
+      }),
+    });
+    const raw = await res.text();
+    if (!res.ok) throw new Error(explainAnthropicError(res.status, raw, env.MODEL));
+    const data = JSON.parse(raw) as { content: (ContentBlock & { citations?: { url?: string; title?: string }[] })[]; stop_reason: string };
+    for (const b of data.content) {
+      if (b.type === "text" && b.text) {
+        text += b.text;
+        for (const c of b.citations ?? []) if (c.url) sources.set(c.url, c.title || c.url);
+      }
+    }
+    if (data.stop_reason !== "pause_turn") break;
+    messages.push({ role: "assistant", content: data.content });
+  }
+  const parsed = jsonFromText(text);
+  if (!parsed) throw new Error("Pippa searched but couldn't put the results together. Try again, or narrow the focus.");
+  return normalizeSearch(parsed, [...sources].map(([url, title]) => ({ url, title })), today);
+}
+
 async function handleApi(req: Request, env: Env, url: URL): Promise<Response> {
   const email = await getEmail(req, env);
   if (!email) return fail(401, "Please sign in with the email you were invited on.");
@@ -191,8 +238,7 @@ async function handleApi(req: Request, env: Env, url: URL): Promise<Response> {
   const method = req.method;
 
   if (path === "/api/me" && method === "GET") {
-    const admins = (env.ADMIN_EMAILS || "").split(",").map((s) => s.trim().toLowerCase()).filter(Boolean);
-    return json({ email, admin: admins.includes(email), accepted: await hasAccepted(env, email), termsVersion: TERMS_VERSION });
+    return json({ email, admin: isAdmin(env, email), online: isOnline(env, email), accepted: await hasAccepted(env, email), termsVersion: TERMS_VERSION });
   }
 
   if (path === "/api/consent" && method === "POST") {
@@ -341,6 +387,28 @@ ${run.need}`;
           : `Internal Resource Finder: ${"document_type" in out ? out.document_type : "document"}`;
       await env.DB.prepare("INSERT INTO runs (id, email, case_id, tool, title, need, output) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)")
         .bind(id, email, kase?.id ?? null, body.tool, title, JSON.stringify({ need: body.need, answers: body.answers ?? [] }), JSON.stringify(out))
+        .run();
+      return json({ id, title, output: out });
+    } catch (e) {
+      return fail(502, e instanceof Error ? e.message : "Something went wrong.");
+    }
+  }
+
+  // Pippa Online: live search for open calls (upgraded accounts only)
+  if (path === "/api/search" && method === "POST") {
+    if (!isOnline(env, email)) return fail(403, "Pippa Online isn't switched on for your account yet.");
+    if (!(await hasAccepted(env, email))) return fail(403, "Please accept the Terms of Use and Privacy Notice first (reload the page).");
+    const body = (await req.json().catch(() => null)) as SearchRequest | null;
+    if (!body?.caseId) return fail(400, "Choose a case first. Pippa searches against it.");
+    const kase = await loadCase(env, email, body.caseId);
+    if (!kase) return fail(404, "That case wasn't found. Save it in step 1 first.");
+    if (!(await takeQuota(env, email, "search"))) return fail(429, `You've reached today's limit of ${env.DAILY_SEARCH_LIMIT || "5"} live searches. It resets at midnight UTC.`);
+    try {
+      const out = await searchClaude(env, kase, body);
+      const id = crypto.randomUUID();
+      const title = `Pippa Online: ${kase.title}`;
+      await env.DB.prepare("INSERT INTO runs (id, email, case_id, tool, title, need, output) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)")
+        .bind(id, email, kase.id, "search", title, JSON.stringify({ focus: body.focus, region: body.region }), JSON.stringify(out))
         .run();
       return json({ id, title, output: out });
     } catch (e) {

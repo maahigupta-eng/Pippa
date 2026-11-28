@@ -127,10 +127,38 @@ export interface ResourcesResult {
 
 export interface RunRecord {
   id: string;
-  tool: Tool;
+  tool: Tool | "search";
   title: string;
   created_at: string;
   case_id?: string | null;
   need?: unknown;
   output?: FunderResult | ResourcesResult;
+}
+
+// ---------- Pippa Online (live search) ----------
+export type Fit = "strong" | "good" | "stretch";
+export interface SearchLead {
+  title: string;
+  funder: string;
+  url: string;
+  deadline: string;
+  amount: string;
+  eligibility: string;
+  fit: Fit;
+  why_fit: string;
+  angle: string;
+  check_first: string;
+}
+export interface SearchResult {
+  summary: string;
+  leads: SearchLead[];
+  where_else: string[];
+  next_step: { action: string; owner: string; within: string };
+  searched_on: string;
+  sources: { title: string; url: string }[];
+}
+export interface SearchRequest {
+  caseId: string;
+  focus: string;
+  region: string;
 }
