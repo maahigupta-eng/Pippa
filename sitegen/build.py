@@ -318,7 +318,7 @@ FAQS = [
     ("Who is Pippa for?", "Organisations and individuals looking for resources for a cause. That includes non-profits and programme teams, social entrepreneurs, and researchers or students applying for grants, fellowships and scholarships."),
     ("What does Pippa help with?", "Three things. It finds resources you already have and can use or offer. It assesses whether a funder is worth your time and how to approach them. And it helps you frame the ask: how much, in what form, and what the funder gains."),
     ("What do I need to get started?", "A short description of your case and the documents you have to hand. For organisations, that may be an asset register, a budget or a programme report. For individuals, a CV, a project outline or a call for applications. Add a funder's guidelines to test your fit."),
-    ("Does Pippa find funders for me?", "Pippa assesses the funders you bring to it in depth, and tells you which kinds of funder suit your case and where to look next."),
+    ("Does Pippa find funders for me?", "On the standard plan, Pippa assesses the funders you bring to it in depth, and tells you which kinds of funder suit your case and where to look next. Pippa Online, available on an upgraded plan, adds live search for open calls, deadline tracking and funder alerts matched to your case."),
     ("How is my information handled?", "Uploaded files are read for your analysis and are not kept. Results are saved to your account so you can return to them, and you can delete them at any time. Nothing you share is used to train AI models."),
     ("How do I get access?", "Write to us with a short note on who you are and what you're raising funds for. We'll review your case and get back to you."),
 ]
