@@ -5,7 +5,7 @@ from pathlib import Path
 OUT = Path(__file__).resolve().parent.parent / "site"
 APP = "https://pippa.maahigupta.workers.dev/"
 ACCESS = "/access"
-WEB3FORMS_KEY = "WEB3FORMS_KEY"  # paste the access key from web3forms.com here
+WEB3FORMS_KEY = "afd3a8fe-848b-4c32-a699-05b0e50fd660"  # public key from web3forms.com
 TAGLINE = "Your strongest grant proposal is already on your books."
 DESCRIPTOR = "An advisor for resource mobilisation"
 
