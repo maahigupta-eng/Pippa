@@ -121,7 +121,7 @@ export function FunderLegend() {
               <td className="nowrap">
                 <strong>Drift risk</strong>
               </td>
-              <td>How far SOS would have to bend its programme to fit this funder.</td>
+              <td>How far you would have to bend your work to fit this funder.</td>
               <td>Higher is worse · under 30 little bending · 30–59 some · 60+ major</td>
             </tr>
           </tbody>

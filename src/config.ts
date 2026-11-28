@@ -14,7 +14,7 @@ export const TEAM = [
   {
     name: "Maahi Gupta",
     role: "Design & build",
-    line: "Built Pippa. Questions about how it works, access, or your data: start here.",
+    line: "Designed and built Pippa. M.S. in Transnational Security, NYU Center for Global Affairs.",
     email: "maahigupta@gmail.com",
     linkedin: "https://www.linkedin.com/in/maahi-gupta-708b2221b/",
     photo: "/team/maahi.jpg",
@@ -23,7 +23,7 @@ export const TEAM = [
   {
     name: "Andras Vamos-Goldman",
     role: "Concept & method",
-    line: "Conceived Pippa and the resource-mobilisation method behind it.",
+    line: "Conceived Pippa and the thinking behind it. Canadian diplomat, international lawyer and social entrepreneur.",
     email: "andrasvg@gmail.com",
     linkedin: "https://www.linkedin.com/in/andras-vamos-goldman-72563a31/",
     photo: "/team/andras.jpg",

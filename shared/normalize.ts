@@ -11,6 +11,7 @@ const clean = (s: string): string =>
   s
     .replace(/<\/?parameter[^>]*>/g, " ")
     .replace(/<\/?(antml:)?(invoke|function_calls)[^>]*>/g, " ")
+    .replace(/<\/?(item|point|li|step|entry|bullet)>/gi, " ")
     .replace(/\s+/g, " ")
     .trim();
 /** Turn leaked markup into an object: { route: "...", why: "..." }. */
@@ -22,8 +23,28 @@ function fromMarkup(s: string): Obj | null {
 }
 const asObj = (v: unknown): Obj | null => (isObj(v) ? v : typeof v === "string" ? fromMarkup(v) : null);
 const str = (v: unknown, fallback = ""): string => (typeof v === "string" ? clean(v) || fallback : typeof v === "number" ? String(v) : fallback);
+/** Some replies pack a list into one string: "<item>A</item> <item>B</item>", or a JSON array. Split it. */
+const TAGGED = /<(item|point|li|step|entry|bullet)>([\s\S]*?)<\/\1>/gi;
+function splitPacked(s: string): string[] {
+  const tagged = [...s.matchAll(TAGGED)].map((m) => str(m[2])).filter(Boolean);
+  if (tagged.length) return tagged;
+  const t = s.trim();
+  if (t.startsWith("[") && t.endsWith("]")) {
+    try {
+      const arr = JSON.parse(t);
+      if (Array.isArray(arr)) return arr.map((x) => str(x)).filter(Boolean);
+    } catch {
+      /* not JSON */
+    }
+  }
+  return [str(s)].filter(Boolean);
+}
 const list = (v: unknown): string[] =>
-  Array.isArray(v) ? v.map((x) => (typeof x === "string" ? str(x) : isObj(x) ? Object.values(x).map((y) => str(y)).filter(Boolean).join(": ") : str(x))).filter(Boolean) : typeof v === "string" && v ? [str(v)] : [];
+  Array.isArray(v)
+    ? v.flatMap((x) => (typeof x === "string" ? splitPacked(x) : isObj(x) ? [Object.values(x).map((y) => str(y)).filter(Boolean).join(": ")] : [str(x)])).filter(Boolean)
+    : typeof v === "string" && v
+      ? splitPacked(v)
+      : [];
 const level = (v: unknown, fallback: Level = "medium"): Level => {
   const s = str(v).toLowerCase();
   return s === "low" || s === "medium" || s === "high" ? s : fallback;
@@ -59,10 +80,10 @@ function score(v: unknown, flatScore?: unknown, flatReason?: unknown) {
 }
 
 function step(r: Obj) {
-  if (r.next_action !== undefined) return { action: str(r.next_action), owner: str(r.next_owner, "The office"), within: str(r.next_within, "the next few weeks") };
+  if (r.next_action !== undefined) return { action: str(r.next_action), owner: str(r.next_owner, "You"), within: str(r.next_within, "the next few weeks") };
   const o = asObj(r.next_step);
-  if (o) return { action: str(o.action ?? o.step), owner: str(o.owner ?? o.who, "The office"), within: str(o.within ?? o.when ?? o.timeframe, "the next few weeks") };
-  return { action: str(r.next_step), owner: "The office", within: "the next few weeks" };
+  if (o) return { action: str(o.action ?? o.step), owner: str(o.owner ?? o.who, "You"), within: str(o.within ?? o.when ?? o.timeframe, "the next few weeks") };
+  return { action: str(r.next_step), owner: "You", within: "the next few weeks" };
 }
 
 export function normalizeFunder(raw: unknown): FunderResult {

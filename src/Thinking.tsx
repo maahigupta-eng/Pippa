@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 const STEPS: Record<string, string[]> = {
   clarify: ["Reading your documents", "Checking them against your case", "Working out what's missing"],
   resources: ["Reading your documents", "Checking against your case and need", "Looking for idle or underused capacity", "Checking mission and safeguarding risks", "Writing it up"],
-  funder: ["Reading the funder's materials", "Checking eligibility", "Scoring material and symbolic fit", "Working out what SOS can offer them", "Writing it up"],
+  funder: ["Reading the funder's materials", "Checking eligibility", "Scoring material and symbolic fit", "Working out what you can offer them", "Writing it up"],
 };
 
 /** Shown while Pippa is working: a spinner, the current stage, and elapsed time. */

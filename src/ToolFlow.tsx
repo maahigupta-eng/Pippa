@@ -24,7 +24,7 @@ const COPY: Record<Tool, { title: string; lead: string; needHint: string; slots:
   },
   funder: {
     title: "Funder Check",
-    lead: "Is this funder worth your time? Pippa scores the fit against what you need, checks eligibility, names the best route in, and says what SOS can offer them.",
+    lead: "Is this funder worth your time? Pippa scores the fit against what you need, checks eligibility, names the best route in, and says what you can offer them.",
     needHint: "What you're raising for (a programme, a gap, a specific cost) and roughly how much.",
     slots: [
       {

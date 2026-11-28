@@ -61,12 +61,33 @@ function NextStep({ s }: { s: { action: string; owner: string; within: string } 
   if (!s.action) return null;
   return (
     <section className="nextstep">
-      <p className="nextstep-label">Do this next</p>
-      <p className="nextstep-action">{s.action}</p>
-      <p className="nextstep-meta">
-        <span>{s.owner}</span>
-        <span>Within {s.within}</span>
-      </p>
+      <div className="nextstep-main">
+        <p className="nextstep-label">Pippa suggests</p>
+        <p className="nextstep-action">{s.action}</p>
+        <dl className="nextstep-meta">
+          <div>
+            <dt>Who</dt>
+            <dd>{s.owner}</dd>
+          </div>
+          <div>
+            <dt>When</dt>
+            <dd>Within {s.within}</dd>
+          </div>
+        </dl>
+      </div>
+      <div className="nextstep-online no-print">
+        <div>
+          <p className="online-title">Take Pippa online</p>
+          <p className="online-text">Live search for open calls, deadline tracking and funder alerts, matched to this case.</p>
+        </div>
+        <button className="upgrade" disabled title="Coming soon" aria-label="Upgrade, coming soon">
+          <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+            <rect x="3" y="7" width="10" height="7" rx="1.5" fill="none" stroke="currentColor" strokeWidth="1.5" />
+            <path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" fill="none" stroke="currentColor" strokeWidth="1.5" />
+          </svg>
+          Upgrade
+        </button>
+      </div>
     </section>
   );
 }
@@ -177,7 +198,7 @@ export function FunderCard({ r: raw }: { r: FunderResult }) {
           </Box>
         )}
         {r.what_funder_gets.length > 0 && (
-          <Box tone="green" icon="✓" title="What they get from SOS">
+          <Box tone="green" icon="✓" title="What they get from you">
             <Bullets items={r.what_funder_gets} />
           </Box>
         )}
@@ -194,7 +215,7 @@ export function FunderCard({ r: raw }: { r: FunderResult }) {
           </Box>
         )}
         {r.internal_leverage.length > 0 && (
-          <Box tone="green" icon="⌂" title="Bring from inside SOS">
+          <Box tone="green" icon="⌂" title="What to bring">
             <Bullets items={r.internal_leverage} />
           </Box>
         )}

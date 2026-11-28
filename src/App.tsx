@@ -169,7 +169,7 @@ function Home({ cases }: { cases: CaseRecord[] }) {
       n: 2,
       path: "resources",
       title: "Internal resources",
-      blurb: "Find idle or underused buildings, equipment, staff time and money inside SOS.",
+      blurb: "Find idle or underused space, equipment, skills, time and money you already have.",
       status: resDone ? `Last run ${fmt(lastOf("resources")!.created_at)}` : "Not run yet",
       done: resDone,
       action: resDone ? "Run again" : "Look inward",

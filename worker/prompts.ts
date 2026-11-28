@@ -7,7 +7,7 @@ import type { AnalyzeRequest, CaseRecord, Tool } from "../shared/types";
 const TOOL_BRIEF: Record<Tool, string> = {
   funder: `TASK: Funder Check.
 Decide whether this funder is worth this office's time for the stated need, and how to approach it.
-Work through: hard eligibility (geography, organisation type, open call vs invite-only, grant size vs need, deadline, instrument), material fit, symbolic fit, drift risk, earmarking and reporting load, acceptability, the best route in (direct, through an existing grantee or regranter, a collaborative, a corporate partnership), what the funder gains from SOS, and how internal resources could be offered as co-financing or leverage.
+Work through: hard eligibility (geography, organisation type, open call vs invite-only, grant size vs need, deadline, instrument), material fit, symbolic fit, drift risk, earmarking and reporting load, acceptability, the best route in (direct, through an existing grantee or regranter, a collaborative, a corporate partnership), what the funder gains from working with the user, and how internal resources could be offered as co-financing or leverage.
 Past grants are the best evidence of what a funder really funds. Weigh them above mission statements.`,
   resources: `TASK: Internal Resource Finder.
 Read the organisation's internal document(s) and find idle, underused or repurposable resources that could meet the stated need, reduce the external ask, or serve as co-financing or collateral.
@@ -86,7 +86,7 @@ export function userContent(req: AnalyzeRequest, kase: CaseRecord | null, phase:
     "",
     phase === "clarify"
       ? "Before analysing: say what each document looks like, then list only the questions whose answers would materially change your analysis (0 to 4). Do not ask what the documents already answer. If nothing important is missing, return no questions and ready = true. Respond only by calling the tool."
-      : "Now produce the analysis. Ground every claim in the materials above. Respond only by calling the tool.",
+      : "Now produce the analysis. Ground every claim in the materials above. List fields are JSON arrays of plain strings: never wrap items in tags like <item> or <point>, and never put several items in one string. Respond only by calling the tool.",
   );
   blocks.push({ type: "text", text: lines.join("\n") });
   return blocks;
@@ -135,7 +135,7 @@ export const FUNDER_TOOL = {
       material_reason: str("One sentence, under 20 words"),
       symbolic_score: { type: "integer", minimum: 0, maximum: 100, description: "Symbolic fit 0-100: does the story line up?" },
       symbolic_reason: str("One sentence, under 20 words"),
-      drift_score: { type: "integer", minimum: 0, maximum: 100, description: "Drift risk 0-100: how far SOS would have to bend; higher is worse" },
+      drift_score: { type: "integer", minimum: 0, maximum: 100, description: "Drift risk 0-100: how far the user would have to bend their work; higher is worse" },
       drift_reason: str("One sentence, under 20 words"),
       hard_checks: {
         type: "array",
@@ -145,7 +145,7 @@ export const FUNDER_TOOL = {
           required: ["check", "status", "note"],
         },
       },
-      what_funder_gets: { ...strList("What this funder gains from SOS, in its own terms. Each item under 15 words."), maxItems: 4 },
+      what_funder_gets: { ...strList("What this funder gains from working with the user, in its own terms. Each item under 15 words."), maxItems: 4 },
       route: str("Best route in, under 8 words, e.g. 'Concept note in the March open call'"),
       route_why: str("Why that route, one sentence under 20 words"),
       positioning: { ...strList("Three talking points for framing the ask, each under 15 words. Not proposal text."), maxItems: 4 },

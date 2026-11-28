@@ -1,57 +1,77 @@
+import { TEAM } from "./config";
+
+const PRINCIPLES = [
+  { k: "Reads first", t: "Pippa works from your case and your documents. Nothing is assumed, and missing facts are listed as missing." },
+  { k: "Shows its working", t: "Every finding points to the line, row or page behind it, so you can check it in seconds." },
+  { k: "Leaves the call to you", t: "Pippa weighs the evidence and sets out the trade-offs. The decision is always yours." },
+];
+
+const STEPS = [
+  { n: 1, title: "Your case", text: "Who you are, what you need, and four questions on the problem, the mission, the people involved and the value of your approach." },
+  { n: 2, title: "Internal resources", text: "Your registers, budgets and reports, read for capacity that is idle, underused or shareable, and ranked by risk, effort and confidence." },
+  { n: 3, title: "Funder check", text: "A funder's own materials read against your case: eligibility, fit, the route in, and what the partnership offers them." },
+];
+
 export default function About() {
   return (
-    <article className="legal">
-      <h1>About Pippa</h1>
-      <p className="lead">
-        Pippa helps organisations and individuals see what they already have,
-        find the partners worth their time, and frame an ask those partners will want to answer. It is built to work only from what you
-        give it: every point traces back to your documents or your answers, and when something isn't there, Pippa says so instead of
-        guessing.
-      </p>
+    <article className="about">
+      <header className="about-hero">
+        <p className="eyebrow">About Pippa</p>
+        <h1>An advisor for resource mobilisation that reads before it speaks.</h1>
+        <p className="lead">
+          Outside money is harder to win and comes with more conditions. The strongest asks now start from what you already hold. Pippa does
+          the reading that takes most people weeks, and hands the judgement back to you.
+        </p>
+      </header>
 
-      <h2>Why it exists</h2>
-      <p>
-        Government aid is shrinking, and fast. Donors change priorities from one year to the next, and every organisation is competing for
-        the same pool of money. The organisations that do well look inward before they look outward, and treat funders as partners with
-        interests of their own.
-      </p>
-      <p>
-        That takes time most people don't have: reading a funder's guidelines and past grants, going through asset registers line by line,
-        working out where the two fit. Pippa does that reading, then hands the judgement back to you.
-      </p>
+      <section className="about-principles">
+        {PRINCIPLES.map((p) => (
+          <div key={p.k} className="principle">
+            <h3>{p.k}</h3>
+            <p>{p.t}</p>
+          </div>
+        ))}
+      </section>
 
-      <h2>How it works</h2>
-      <ol>
-        <li>
-          <strong>Your case</strong> holds who you are, what you need, and four questions: the problem, the mission, the stakeholders, the value proposition.
-        </li>
-        <li>
-          <strong>The Internal Resource Finder</strong> reads your own records for idle or underused capacity that could fund the work or
-          count as co-financing.
-        </li>
-        <li>
-          <strong>Funder Check</strong> reads a funder's own materials, scores the fit, checks eligibility, and says what your organisation
-          can offer them.
-        </li>
-      </ol>
+      <section>
+        <h2>How it works</h2>
+        <ol className="about-steps">
+          {STEPS.map((s) => (
+            <li key={s.n}>
+              <span className={`about-n n${s.n}`}>{s.n}</span>
+              <div>
+                <h3>{s.title}</h3>
+                <p>{s.text}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+        <p className="muted small">Ask Pippa sits beside every result: press on a finding, test a framing, or ask what would change the verdict.</p>
+      </section>
 
-      <h2>The people behind it</h2>
-      <div className="people">
-        <div>
-          <h3>Maahi Gupta</h3>
-          <p>
-            Designed and built Pippa. She holds an M.S. in Transnational Security from NYU's Center for Global Affairs and works across
-            research, policy and product design.
-          </p>
+      <section>
+        <h2>Meet the team</h2>
+        <div className="about-team">
+          {TEAM.map((m) => (
+            <div key={m.name} className={`about-person tone-${m.tone}`}>
+              <img src={m.photo} alt={m.name} width={88} height={88} />
+              <div>
+                <h3>{m.name}</h3>
+                <p className="about-role">{m.role}</p>
+                <p>{m.line}</p>
+                <p className="about-links">
+                  {m.email && <a href={`mailto:${m.email}`}>Email</a>}
+                  {m.linkedin && (
+                    <a href={m.linkedin} target="_blank" rel="noreferrer">
+                      LinkedIn
+                    </a>
+                  )}
+                </p>
+              </div>
+            </div>
+          ))}
         </div>
-        <div>
-          <h3>Andras Vamos-Goldman</h3>
-          <p>
-            Canadian diplomat, international lawyer and social entrepreneur. He conceived Pippa as part of rethinking how social-impact
-            organisations raise resources.
-          </p>
-        </div>
-      </div>
+      </section>
     </article>
   );
 }
