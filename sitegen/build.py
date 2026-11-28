@@ -4,16 +4,16 @@ from pathlib import Path
 
 OUT = Path(__file__).resolve().parent.parent / "site"
 APP = "https://pippa.maahigupta.workers.dev/"
-ACCESS = "mailto:maahigupta@gmail.com?subject=Pippa%20access"
+ACCESS = "/access"
+WEB3FORMS_KEY = "WEB3FORMS_KEY"  # paste the access key from web3forms.com here
 TAGLINE = "Your strongest grant proposal is already on your books."
 DESCRIPTOR = "An advisor for resource mobilisation"
 
 LOGO = """<svg class="logo-mark" viewBox="0 0 54 54" aria-hidden="true"><circle cx="27" cy="27" r="25" fill="none" stroke="currentColor" stroke-width="2.6"/><path d="M27 7 L32 27 L27 24 L22 27Z" fill="#3f7a69"/><path d="M27 47 L22 27 L27 30 L32 27Z" fill="#f2d35b" stroke="currentColor" stroke-width="1"/><circle cx="27" cy="27" r="2.2" fill="currentColor"/></svg>"""
 
-PAGES = [  # slug, nav label, title
+PAGES = [  # slug, nav label, title (these appear in the nav, in this order)
     ("why", "Why now", "Why now"),
-    ("method", "The method", "The method"),
-    ("tools", "The tools", "The tools"),
+    ("how", "How it works", "How it works"),
     ("team", "Team", "Meet the team"),
     ("contact", "Contact", "Contact"),
 ]
@@ -48,7 +48,7 @@ def footer():
   <div class="foot-inner">
     <a class="brand foot-brand" href="/">{LOGO}<span class="brand-name">Pippa</span></a>
     <p class="foot-tag">Find what you already have. Then find who to ask, and how.</p>
-    <nav class="foot-links" aria-label="Footer">{links}<a href="{APP}">Sign in</a></nav>
+    <nav class="foot-links" aria-label="Footer">{links}<a href="/privacy">Privacy</a><a href="{APP}">Sign in</a></nav>
     <p class="foot-copy">© 2026 Pippa. All rights reserved. Pippa uses AI; check results before you act on them.</p>
   </div>
 </footer>"""
@@ -56,6 +56,8 @@ def footer():
 
 def next_link(slug):
     order = ["home"] + [p[0] for p in PAGES]
+    if slug not in order:
+        return ""
     i = order.index(slug)
     if i + 1 >= len(order):
         return ""
@@ -162,7 +164,7 @@ HOME = f"""<section class="hero wrap">
   <div class="hero-copy">
     <h1 class="split">{TAGLINE}</h1>
     <p class="hero-sub" data-reveal>Pippa reads your registers, budgets and funder documents. It shows what you can bring to the table, which funders fit, and how to ask.</p>
-    <div class="ctas" data-reveal><a class="btn btn-ink" href="{ACCESS}">Request access</a><a class="btn btn-line" href="/method">See the method</a></div>
+    <div class="ctas" data-reveal><a class="btn btn-ink" href="{ACCESS}">Request access</a><a class="btn btn-line" href="/how">How it works</a></div>
   </div>
   <figure class="register" aria-label="Pippa reading an asset register">
     <div class="register-head"><span class="register-title">Asset register</span><span class="register-status" aria-live="polite"><span class="pulse" aria-hidden="true"></span><span id="reg-status">Reading line 1 of 9</span></span></div>
@@ -215,23 +217,7 @@ HOME = f"""<section class="hero wrap">
     </ol>
   </div>
 </section>
-
-<section class="results">
-  <div class="wrap">
-    <div class="block-head" data-reveal>
-      <h2>A verdict you can act on.</h2>
-      <p>A short brief with a clear call, the reasons, and one next step with an owner.</p>
-    </div>
-    <div class="results-grid">
-      {MOCKS}
-      <ul class="callouts">
-        <li data-reveal><b>Every claim has a source.</b> Each finding points to the line it came from.</li>
-        <li data-reveal><b>One of four verdicts.</b> Pursue, pursue narrowly, hold, or don't pursue.</li>
-        <li data-reveal><b>It knows what to leave alone.</b> Restricted assets and anything near children are flagged.</li>
-      </ul>
-    </div>
-  </div>
-</section>"""
+"""
 
 WHY = f"""<section class="page-head wrap">
   <h1 class="split">Why now</h1>
@@ -247,47 +233,26 @@ WHY = f"""<section class="page-head wrap">
   </ol>
 </section>"""
 
-METHOD = f"""<section class="page-head wrap">
-  <h1 class="split">The method</h1>
-  <p class="page-lede" data-reveal>Pippa follows Quo Vadis, a method for resource mobilisation developed by Andras Vamos-Goldman. Five moves, always in this order.</p>
-</section>
-<section class="wrap block">
-  <ol class="steps" id="steps">
-    <li data-reveal><span class="step-n">1</span><div><h3>Frame the case</h3><p>What exactly are you solving, and how? Who is affected, who could help, who might resist? Why would anyone back this approach?</p></div></li>
-    <li data-reveal><span class="step-n">2</span><div><h3>Before the beginning</h3><p>Where does the need sit in your goals and your structure? Could it scale? Plan for that early, because it shapes the ask.</p></div></li>
-    <li data-reveal><span class="step-n">3</span><div><h3>Look inward first</h3><p>Office, then region, then the whole organisation. Internal resources rarely cover everything. They cut the ask and give you something to offer.</p>
-      <div class="kinds">
-        <div><b>Human</b><span>Skills staff already have that others would pay for.</span></div>
-        <div><b>Material</b><span>Buildings, vehicles, land and equipment with spare capacity.</span></div>
-        <div><b>Project</b><span>Room in running projects, like a clinic or a school.</span></div>
-        <div><b>Saving</b><span>Costs you can cut or share with a partner.</span></div>
-      </div></div></li>
-    <li data-reveal><span class="step-n">4</span><div><h3>Then look outward</h3><p>Ask for a range, never one number. Pick the form that fits: grant, loan, in-kind or partnership. Decide whose money you'll accept. Say plainly what the funder gains.</p></div></li>
-    <li data-reveal><span class="step-n">5</span><div><h3>Think about the system</h3><p>Could this project change what causes the need in the first place? Say so only when it's real. One line is enough.</p></div></li>
-  </ol>
-</section>"""
-
-TOOLS = f"""<section class="page-head wrap">
-  <h1 class="split">The tools</h1>
-  <p class="page-lede" data-reveal>Three steps and an advisor on call. Upload what you have, answer a few sharp questions, get a brief.</p>
+HOW = f"""<section class="page-head wrap">
+  <h1 class="split">How it works</h1>
+  <p class="page-lede" data-reveal>You bring the documents. Pippa does the reading, and tells you what's worth your time.</p>
 </section>
 <section class="wrap block">
   <div class="tool-list">
-    <article data-reveal><span class="tool-n">1</span><h3>Your case</h3><p>Say who you are, what you need, and the problem you're solving. Pippa tailors every analysis to it.</p></article>
-    <article data-reveal><span class="tool-n">2</span><h3>Internal resources</h3><p>Upload an asset register, budget or programme report. Pippa finds what's sitting unused and ranks it by risk, effort and confidence.</p></article>
-    <article data-reveal><span class="tool-n">3</span><h3>Funder check</h3><p>Add a funder's own materials. Pippa checks eligibility, scores the fit, names the route in, and says what you can offer.</p></article>
-    <article data-reveal><span class="tool-n">+</span><h3>Ask Pippa</h3><p>Questions about a result? Ask. Answers stay grounded in your documents.</p></article>
+    <article data-reveal><span class="tool-n">1</span><div><p class="tool-k">Frame the case</p><h3>Your case</h3><p>Who you are, what you need, and why it matters. Everything after is tailored to it.</p></div></article>
+    <article data-reveal><span class="tool-n">2</span><div><p class="tool-k">Look inward first</p><h3>Internal resources</h3><p>What you already hold, before you ask anyone else. It shrinks the ask and gives you something to offer.</p></div></article>
+    <article data-reveal><span class="tool-n">3</span><div><p class="tool-k">Then look outward</p><h3>Funder check</h3><p>Which funders are worth your time, the way in, and what they get back.</p></div></article>
+    <article data-reveal><span class="tool-n">4</span><div><p class="tool-k">On call</p><h3>Ask Pippa</h3><p>A question about a result? Ask it in plain words.</p></div></article>
   </div>
 </section>
-<section class="results">
+<section class="kinds-band">
   <div class="wrap">
-    <div class="block-head" data-reveal><h2>What a result looks like.</h2><p>Short, boxed and scored. Built for people who have ten minutes, not an afternoon.</p></div>
-    <div class="results-grid">{MOCKS}
-      <ul class="callouts">
-        <li data-reveal><b>Works only from what you give it.</b> No browsing, no guessing. Missing facts are listed as missing.</li>
-        <li data-reveal><b>Asks before it answers.</b> Up to four questions about gaps that would change the verdict.</li>
-        <li data-reveal><b>Leaves the right things alone.</b> Donor-restricted assets and anything near children are never offered up.</li>
-      </ul>
+    <div class="block-head" data-reveal><h2>Four kinds of resource you already have.</h2><p>Most organisations and people undercount what they hold. Pippa looks in four places.</p></div>
+    <div class="kinds">
+      <div data-reveal><b>Human</b><span>Skills you or your team already have that others would pay for.</span></div>
+      <div data-reveal><b>Material</b><span>Buildings, vehicles, land and equipment with room to spare.</span></div>
+      <div data-reveal><b>Project</b><span>Spare capacity in work already running, like a clinic, a lab or a school.</span></div>
+      <div data-reveal><b>Saving</b><span>Costs you can cut, or share with a partner.</span></div>
     </div>
   </div>
 </section>"""
@@ -308,7 +273,7 @@ TEAM = f"""<section class="page-head wrap">
       <div class="photo alt"><img src="/img/andras.jpg" alt="Andras Vamos-Goldman" width="480" height="480" /></div>
       <h2>Andras Vamos-Goldman</h2>
       <p class="role">Concept and method</p>
-      <p>Conceived Pippa and the Quo Vadis method. Canadian diplomat, international lawyer and social entrepreneur.</p>
+      <p>Conceived Pippa and the thinking behind it. Canadian diplomat, international lawyer and social entrepreneur.</p>
       <p class="links"><a href="mailto:andrasvg@gmail.com">andrasvg@gmail.com</a><a href="https://www.linkedin.com/in/andras-vamos-goldman-72563a31/" target="_blank" rel="noreferrer">LinkedIn</a></p>
     </article>
   </div>
@@ -331,7 +296,7 @@ CONTACT = f"""<section class="faq wrap">
   <h1 class="faq-title split">How can we help?</h1>
   <div class="support" data-reveal>
     <div class="support-block"><span class="support-icon">{ICON_KEY}</span><div><h2>Getting access</h2><p>Pippa is in a closed pilot. Tell us about your organisation and we'll set you up.</p><a class="tlink" href="{ACCESS}">Request access {ARROW}</a></div></div>
-    <div class="support-block"><span class="support-icon">{ICON_DOC}</span><div><h2>Your documents</h2><p>Files are read once and not kept. Nothing you upload trains AI models.</p><a class="tlink" href="#questions">How we handle data {ARROW}</a></div></div>
+    <div class="support-block"><span class="support-icon">{ICON_DOC}</span><div><h2>Your documents</h2><p>Files are read once and not kept. Nothing you upload trains AI models.</p><a class="tlink" href="/privacy">How we handle data {ARROW}</a></div></div>
     <div class="support-block"><span class="support-icon">{ICON_HAND}</span><div><h2>Working with us</h2><p>Partnerships, pilots or press. Write to either of us and we'll reply within a few days.</p><a class="tlink" href="mailto:maahigupta@gmail.com,andrasvg@gmail.com?subject=Pippa">Email the team {ARROW}</a></div></div>
   </div>
   <div class="qa" id="questions">
@@ -340,13 +305,59 @@ CONTACT = f"""<section class="faq wrap">
   </div>
 </section>"""
 
+
+from personas_list import PERSONA_LABELS  # noqa: E402
+
+ACCESS_PAGE = f"""<section class="page-head wrap narrow">
+  <h1 class="split">Request access</h1>
+  <p class="page-lede" data-reveal>Pippa is in a closed pilot. Tell us a little about yourself and we'll be in touch.</p>
+</section>
+<section class="wrap block narrow">
+  <form class="access-form" id="access-form" action="https://api.web3forms.com/submit" method="POST" data-key="{WEB3FORMS_KEY}" data-reveal>
+    <input type="hidden" name="access_key" value="{WEB3FORMS_KEY}" />
+    <input type="hidden" name="subject" value="Pippa access request" />
+    <input type="hidden" name="from_name" value="Pippa website" />
+    <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
+    <div class="row2">
+      <label><span>Name</span><input name="name" required autocomplete="name" /></label>
+      <label><span>Email</span><input name="email" type="email" required autocomplete="email" /></label>
+    </div>
+    <label><span>Organisation or institution</span><input name="organisation" autocomplete="organization" /></label>
+    <fieldset><legend>You are</legend><div class="radio-row">{"".join(f'<label class="pick"><input type="radio" name="who" value="{x}" required /><span>{x}</span></label>' for x in PERSONA_LABELS)}</div></fieldset>
+    <label><span>What are you raising money for?</span><textarea name="message" rows="4" required placeholder="A line or two is plenty."></textarea></label>
+    <button class="btn btn-ink" type="submit">Send request</button>
+    <p class="form-note" id="form-note" role="status" aria-live="polite">We'll only use these details to reply to you. <a href="/privacy">Privacy</a></p>
+  </form>
+</section>"""
+
+PRIVACY_PAGE = """<section class="page-head wrap narrow">
+  <h1 class="split">Privacy</h1>
+  <p class="page-lede" data-reveal>Pippa holds only what it needs, never sells your data, and never uses your material to train AI models.</p>
+</section>
+<section class="wrap block narrow legal">
+  <h2>This website</h2>
+  <p>This site sets no cookies and runs no analytics or advertising. If you request access, we receive your name, email, organisation and message by email, through our form provider, Web3Forms. We use them only to reply to you, and delete them if you don't go on to use Pippa.</p>
+  <h2>Using Pippa</h2>
+  <p>When you sign in, Pippa stores your email address, the case you set up, your answers to its questions, and the results it gives you, so you can come back to them. It keeps a daily count of your runs for fair-use limits, and a record that you accepted its terms.</p>
+  <p>Files you upload are not stored. They are read in your browser or sent once to our AI provider for the analysis you asked for. Only the result is saved. Questions you ask Pippa about a result are not stored either.</p>
+  <h2>Who else handles it</h2>
+  <p>Cloudflare hosts Pippa, stores your saved work and runs sign-in. Anthropic provides the AI model; under its commercial terms, material sent through its API is not used to train its models. Both are based in the United States. We don't sell your data or share your work with anyone else unless you ask us to or the law requires it.</p>
+  <h2>How long we keep it</h2>
+  <p>We keep your data while you have access to Pippa, and delete it within 30 days after. You can delete individual results, or everything at once, from inside Pippa at any time.</p>
+  <h2>Your rights</h2>
+  <p>You can ask to see, correct, export or delete your data. Write to <a href="mailto:maahigupta@gmail.com">maahigupta@gmail.com</a>. If you are in the UK, the EU or Switzerland, you can also complain to your data protection authority.</p>
+  <h2>Please don't upload personal data about others</h2>
+  <p>Remove names and details that identify beneficiaries, children, families or staff before you upload a document.</p>
+</section>"""
+
 BODIES = {
     "home": ("Pippa", HOME, "Pippa reads your registers, budgets and funder documents. It shows what you can bring to the table, which funders fit, and how to ask."),
     "why": ("Why now", WHY, "Government aid had its largest fall on record in 2025. Funders who remain want partners who bring something to the table."),
-    "method": ("The method", METHOD, "Pippa follows Quo Vadis: frame the case, look inward first, then look outward."),
-    "tools": ("The tools", TOOLS, "Your case, internal resources, funder check, and an advisor on call."),
+    "how": ("How it works", HOW, "Frame the case, look inward first, then look outward. Pippa does the reading."),
     "team": ("Meet the team", TEAM, "Maahi Gupta and Andras Vamos-Goldman."),
     "contact": ("Contact", CONTACT, "Getting access, your documents, and working with us."),
+    "access": ("Request access", ACCESS_PAGE, "Request access to the Pippa pilot."),
+    "privacy": ("Privacy", PRIVACY_PAGE, "How Pippa handles your information."),
 }
 
 for slug, (title, body, desc) in BODIES.items():

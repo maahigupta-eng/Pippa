@@ -76,7 +76,7 @@ export function ResourcesLegend() {
       <summary>How to read these ratings</summary>
       <p className="small muted">Green is better in every row: low risk, low effort, high confidence.</p>
       <LevelTable />
-      <h4>Resource types (from Module 2)</h4>
+      <h4>Resource types</h4>
       <dl className="legend-types">
         {TYPES.map(([t, d]) => (
           <div key={t}>

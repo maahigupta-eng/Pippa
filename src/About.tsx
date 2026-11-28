@@ -3,7 +3,7 @@ export default function About() {
     <article className="legal">
       <h1>About Pippa</h1>
       <p className="lead">
-        Pippa carries the method from the course into everyday work. It helps resource mobilisers see what their organisation already has,
+        Pippa helps organisations and individuals see what they already have,
         find the partners worth their time, and frame an ask those partners will want to answer. It is built to work only from what you
         give it: every point traces back to your documents or your answers, and when something isn't there, Pippa says so instead of
         guessing.
@@ -23,7 +23,7 @@ export default function About() {
       <h2>How it works</h2>
       <ol>
         <li>
-          <strong>Your case</strong> holds the four steps from the course: the problem, the mission, the stakeholders, the value proposition.
+          <strong>Your case</strong> holds who you are, what you need, and four questions: the problem, the mission, the stakeholders, the value proposition.
         </li>
         <li>
           <strong>The Internal Resource Finder</strong> reads your own records for idle or underused capacity that could fund the work or

@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Request access · Pippa</title>
+<meta name="description" content="Request access to the Pippa pilot." />
+<meta property="og:title" content="Request access · Pippa" />
+<meta property="og:description" content="Request access to the Pippa pilot." />
+<meta name="theme-color" content="#14231F" />
+<script>document.documentElement.classList.add("js")</script>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="preload" href="/fonts/eb-garamond-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="stylesheet" href="/styles.css" />
+</head>
+<body data-page="access">
+<a class="skip" href="#main">Skip to content</a>
+<header class="masthead" id="masthead">
+  <div class="mast-top">
+    <a class="brand" href="/" aria-label="Pippa home"><svg class="logo-mark" viewBox="0 0 54 54" aria-hidden="true"><circle cx="27" cy="27" r="25" fill="none" stroke="currentColor" stroke-width="2.6"/><path d="M27 7 L32 27 L27 24 L22 27Z" fill="#3f7a69"/><path d="M27 47 L22 27 L27 30 L32 27Z" fill="#f2d35b" stroke="currentColor" stroke-width="1"/><circle cx="27" cy="27" r="2.2" fill="currentColor"/></svg><span class="brand-name">Pippa</span></a>
+    <p class="descriptor">An advisor for resource mobilisation</p>
+    <button class="menu-btn" aria-expanded="false" aria-controls="mast-nav">Menu</button>
+  </div>
+  <div class="mast-row" id="mast-nav">
+    <a class="brand brand-mini" href="/" aria-label="Pippa home"><svg class="logo-mark" viewBox="0 0 54 54" aria-hidden="true"><circle cx="27" cy="27" r="25" fill="none" stroke="currentColor" stroke-width="2.6"/><path d="M27 7 L32 27 L27 24 L22 27Z" fill="#3f7a69"/><path d="M27 47 L22 27 L27 30 L32 27Z" fill="#f2d35b" stroke="currentColor" stroke-width="1"/><circle cx="27" cy="27" r="2.2" fill="currentColor"/></svg><span class="brand-name">Pippa</span></a>
+    <nav class="mast-links" aria-label="Main"><a href="/why">Why now</a><a href="/how">How it works</a><a href="/team">Team</a><a href="/contact">Contact</a></nav>
+    <div class="mast-actions"><a href="https://pippa.maahigupta.workers.dev/">Sign in</a><a class="req" href="/access">Request access</a></div>
+  </div>
+</header>
+<main id="main">
+<section class="page-head wrap narrow">
+  <h1 class="split">Request access</h1>
+  <p class="page-lede" data-reveal>Pippa is in a closed pilot. Tell us a little about yourself and we'll be in touch.</p>
+</section>
+<section class="wrap block narrow">
+  <form class="access-form" id="access-form" action="https://api.web3forms.com/submit" method="POST" data-key="WEB3FORMS_KEY" data-reveal>
+    <input type="hidden" name="access_key" value="WEB3FORMS_KEY" />
+    <input type="hidden" name="subject" value="Pippa access request" />
+    <input type="hidden" name="from_name" value="Pippa website" />
+    <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
+    <div class="row2">
+      <label><span>Name</span><input name="name" required autocomplete="name" /></label>
+      <label><span>Email</span><input name="email" type="email" required autocomplete="email" /></label>
+    </div>
+    <label><span>Organisation or institution</span><input name="organisation" autocomplete="organization" /></label>
+    <fieldset><legend>You are</legend><div class="radio-row"><label class="pick"><input type="radio" name="who" value="An organisation" required /><span>An organisation</span></label><label class="pick"><input type="radio" name="who" value="A researcher or academic" required /><span>A researcher or academic</span></label><label class="pick"><input type="radio" name="who" value="A student" required /><span>A student</span></label><label class="pick"><input type="radio" name="who" value="A social entrepreneur" required /><span>A social entrepreneur</span></label><label class="pick"><input type="radio" name="who" value="An individual with a cause" required /><span>An individual with a cause</span></label></div></fieldset>
+    <label><span>What are you raising money for?</span><textarea name="message" rows="4" required placeholder="A line or two is plenty."></textarea></label>
+    <button class="btn btn-ink" type="submit">Send request</button>
+    <p class="form-note" id="form-note" role="status" aria-live="polite">We'll only use these details to reply to you. <a href="/privacy">Privacy</a></p>
+  </form>
+</section>
+<div class="wrap next-wrap"></div>
+</main>
+<footer class="foot">
+  <div class="foot-inner">
+    <a class="brand foot-brand" href="/"><svg class="logo-mark" viewBox="0 0 54 54" aria-hidden="true"><circle cx="27" cy="27" r="25" fill="none" stroke="currentColor" stroke-width="2.6"/><path d="M27 7 L32 27 L27 24 L22 27Z" fill="#3f7a69"/><path d="M27 47 L22 27 L27 30 L32 27Z" fill="#f2d35b" stroke="currentColor" stroke-width="1"/><circle cx="27" cy="27" r="2.2" fill="currentColor"/></svg><span class="brand-name">Pippa</span></a>
+    <p class="foot-tag">Find what you already have. Then find who to ask, and how.</p>
+    <nav class="foot-links" aria-label="Footer"><a href="/why">Why now</a><a href="/how">How it works</a><a href="/team">Team</a><a href="/contact">Contact</a><a href="/privacy">Privacy</a><a href="https://pippa.maahigupta.workers.dev/">Sign in</a></nav>
+    <p class="foot-copy">© 2026 Pippa. All rights reserved. Pippa uses AI; check results before you act on them.</p>
+  </div>
+</footer>
+<script src="/main.js" defer></script>
+</body>
+</html>

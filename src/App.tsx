@@ -160,7 +160,7 @@ function Home({ cases }: { cases: CaseRecord[] }) {
       n: 1,
       path: "case",
       title: "Your case",
-      blurb: "The four steps from Module 1: problem, mission, stakeholders, value proposition.",
+      blurb: "Who you are, what you need, and the problem you're solving.",
       status: caseDone ? `Done · ${cases[0].title}` : "Start here",
       done: caseDone,
       action: caseDone ? "Revisit" : "Set up your case",
@@ -189,7 +189,7 @@ function Home({ cases }: { cases: CaseRecord[] }) {
     <section className="landing">
       <div className="landing-head">
         <h1>Look inward first. Then find the partners worth your time.</h1>
-        <p className="lead">Three steps, in the order you learned them in the course. Pippa reads your documents and tells you plainly what's worth pursuing.</p>
+        <p className="lead">Three steps. Pippa reads your documents and tells you plainly what's worth pursuing.</p>
       </div>
 
       <ol className="step-cards">

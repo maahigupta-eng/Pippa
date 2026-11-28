@@ -4,7 +4,16 @@
 
   /* Masthead: collapse the top tier on scroll; mobile menu */
   const mast = document.getElementById("masthead");
-  const onScroll = () => mast && mast.classList.toggle("compact", window.scrollY > 40);
+  // Folding the top tier shortens the page above the fold, which moves scrollY. Separate on/off
+  // thresholds (wider apart than the tier's height) stop the header flickering between states.
+  let compact = false;
+  const onScroll = () => {
+    if (!mast) return;
+    const y = window.scrollY;
+    if (!compact && y > 140) compact = true;
+    else if (compact && y < 12) compact = false;
+    mast.classList.toggle("compact", compact);
+  };
   window.addEventListener("scroll", onScroll, { passive: true });
   onScroll();
   const btn = document.querySelector(".menu-btn");
@@ -73,6 +82,40 @@
     };
     window.addEventListener("scroll", update, { passive: true });
     update();
+  }
+
+
+  /* Request access form: sends through Web3Forms; falls back to email until a key is set */
+  const form = document.getElementById("access-form");
+  if (form) {
+    const note = document.getElementById("form-note");
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const data = new FormData(form);
+      if (data.get("botcheck")) return;
+      const key = form.dataset.key;
+      if (!key || key === "WEB3FORMS_KEY") {
+        const body = ["Name: " + data.get("name"), "Email: " + data.get("email"), "Organisation: " + (data.get("organisation") || ""), "You are: " + data.get("who"), "", data.get("message")].join("\n");
+        location.href = "mailto:maahigupta@gmail.com?subject=" + encodeURIComponent("Pippa access request") + "&body=" + encodeURIComponent(body);
+        return;
+      }
+      const btn = form.querySelector("button[type=submit]");
+      btn.disabled = true; btn.textContent = "Sending…";
+      note.className = "form-note"; note.textContent = "";
+      try {
+        const res = await fetch(form.action, { method: "POST", headers: { Accept: "application/json" }, body: data });
+        const out = await res.json();
+        if (!res.ok || !out.success) throw new Error(out.message || "Something went wrong.");
+        form.querySelectorAll("input:not([type=hidden]), textarea, fieldset, .row2, button").forEach((el) => (el.hidden = true));
+        form.querySelectorAll("label").forEach((el) => (el.hidden = true));
+        note.className = "form-note ok";
+        note.textContent = "Thank you. Your request is in, and we'll reply by email.";
+      } catch (err) {
+        btn.disabled = false; btn.textContent = "Send request";
+        note.className = "form-note err";
+        note.innerHTML = "That didn't send. Please try again, or write to <a href='mailto:maahigupta@gmail.com'>maahigupta@gmail.com</a>.";
+      }
+    });
   }
 
   /* Hero register */
