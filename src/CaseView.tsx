@@ -11,6 +11,19 @@ const PROFILE_KEYS = ["office", "programmes", "served", "scale"] as const;
 
 const CHALLENGE_KEYS = ["problem", "mission", "stakeholders", "value"] as const;
 
+/** A small "See an example" link that opens one sample answer under a field. */
+function Example({ text }: { text: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="example">
+      <button type="button" className="example-link" aria-expanded={open} onClick={() => setOpen(!open)}>
+        {open ? "Hide example" : "See an example"}
+      </button>
+      {open && <p className="example-box">{text}</p>}
+    </div>
+  );
+}
+
 const countDone = (vals: (string | undefined)[]) => vals.filter((v) => v && v.trim()).length;
 
 /** One collapsible section of the case form. Collapsed, it shows a one-line summary. */
@@ -179,10 +192,13 @@ export default function CaseView({ cases, onSaved }: { cases: CaseRecord[]; onSa
           <AutoText value={title} onChange={setTitle} placeholder={who.examples} />
         </label>
         {PROFILE_KEYS.map((k) => (
-          <label className="field" key={k}>
+          <div className="field-group" key={k}>
+          <label className="field">
             <span>{who.fields[k][0]}</span>
             <AutoText value={profile[k]} placeholder={who.fields[k][1]} onChange={(v) => setProfile({ ...profile, [k]: v })} />
           </label>
+          <Example key={`${who.key}-${k}`} text={who.samples[k]} />
+          </div>
         ))}
       </CaseStep>
 
@@ -194,10 +210,13 @@ export default function CaseView({ cases, onSaved }: { cases: CaseRecord[]; onSa
         summary={`${countDone(CHALLENGE_KEYS.map((k) => challenge[k]))} of 4 answered`}
       >
         {CHALLENGE_KEYS.map((k) => (
-          <label className="field" key={k}>
+          <div className="field-group" key={k}>
+          <label className="field">
             <span>{who.challenge[k][0]}</span>
             <AutoText minRows={3} value={challenge[k]} placeholder={who.challenge[k][1]} onChange={(v) => setChallenge({ ...challenge, [k]: v })} />
           </label>
+          <Example key={`${who.key}-${k}`} text={who.samples[k]} />
+          </div>
         ))}
       </CaseStep>
 
