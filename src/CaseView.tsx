@@ -36,16 +36,24 @@ export default function CaseView({ cases, onSaved }: { cases: CaseRecord[]; onSa
     setStatus(null);
   }, [current, cases]);
 
-  async function save() {
+  async function save(asNew = false) {
     setStatus("Saving…");
     try {
-      const { id } = await api.saveCase({ id: current === "new" ? undefined : current, title, profile, challenge });
+      const { id } = await api.saveCase({ id: current === "new" || asNew ? undefined : current, title, profile, challenge });
       onSaved();
       setCurrent(id);
-      setStatus("Saved. Next: step 2, internal resources.");
+      setStatus(asNew ? "Saved as a new case. Next: step 2, internal resources." : "Saved. Next: step 2, internal resources.");
     } catch (e) {
       setStatus((e as Error).message);
     }
+  }
+
+  function startNew() {
+    setCurrent("new");
+    setTitle("");
+    setProfile(EMPTY_PROFILE);
+    setChallenge(EMPTY_CHALLENGE);
+    setStatus(null);
   }
 
   return (
@@ -58,17 +66,32 @@ export default function CaseView({ cases, onSaved }: { cases: CaseRecord[]; onSa
       </p>
 
       {cases.length > 0 && (
-        <label className="field inline">
-          <span>Case</span>
-          <select value={current} onChange={(e) => setCurrent(e.target.value)}>
-            {cases.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.title}
-              </option>
-            ))}
-            <option value="new">+ New case</option>
-          </select>
-        </label>
+        <div className="case-picker">
+          <label className="field inline">
+            <span>Case</span>
+            <select value={current} onChange={(e) => (e.target.value === "new" ? startNew() : setCurrent(e.target.value))}>
+              {cases.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.title}
+                </option>
+              ))}
+              <option value="new">+ New case</option>
+            </select>
+          </label>
+          {current !== "new" && (
+            <button type="button" className="secondary" onClick={startNew}>
+              + Start a new case
+            </button>
+          )}
+        </div>
+      )}
+      {current !== "new" ? (
+        <p className="case-mode">
+          You're editing <b>{cases.find((c) => c.id === current)?.title}</b>. Changes replace this case when you save. To keep it, use “Save as a
+          new case”.
+        </p>
+      ) : (
+        cases.length > 0 && <p className="case-mode new">New case. Your other cases stay as they are.</p>
       )}
 
       <h2>Who are you?</h2>
@@ -126,9 +149,14 @@ export default function CaseView({ cases, onSaved }: { cases: CaseRecord[]; onSa
       ))}
 
       <div className="cta-row">
-        <button className="primary" onClick={save} disabled={!title.trim()}>
-          Save case
+        <button className="primary" onClick={() => save(false)} disabled={!title.trim()}>
+          {current === "new" ? "Save case" : "Save changes"}
         </button>
+        {current !== "new" && (
+          <button className="secondary" onClick={() => save(true)} disabled={!title.trim()}>
+            Save as a new case
+          </button>
+        )}
         {current !== "new" && (
           <button
             className="link"

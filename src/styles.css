@@ -456,3 +456,26 @@ footer p { margin: 6px 0; }
 .about-links { display: flex; gap: 14px; }
 .about-links a { color: var(--accent); font-weight: 600; }
 @media (max-width: 760px) { .about-principles, .about-team { grid-template-columns: 1fr; } }
+
+/* Case picker */
+.case-picker { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; }
+.case-picker .field { margin-bottom: 0; flex: 1 1 260px; }
+button.secondary { background: var(--card); color: var(--accent); border: 1.5px solid var(--accent); }
+button.secondary:hover:not(:disabled) { background: var(--accent-soft); }
+.case-mode { margin: 12px 0 4px; padding: 10px 14px; border-radius: 10px; background: #fdf4e3; border: 1px solid #efd9a8; font-size: 0.92rem; color: #6b4e12; }
+.case-mode.new { background: var(--accent-soft); border-color: #c9ddd4; color: var(--accent); }
+
+/* Phones */
+@media (max-width: 720px) {
+  .top nav { flex: 1 1 100%; display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 8px 14px; }
+  .top nav .stepnav { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .top nav .stepnav a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 8px 4px; border: 1px solid var(--line); border-radius: 10px; font-size: 0.78rem; line-height: 1.2; text-align: center; min-height: 58px; }
+  .top nav .stepnav a.active { border-color: var(--accent); background: var(--accent-soft); color: var(--ink); }
+  .top nav > a { font-size: 0.9rem; justify-self: end; }
+  .top nav > a:first-of-type { grid-column: 2; }
+  .who { display: none; }
+  input, textarea, select { font-size: 16px; } /* stops iOS zooming into fields */
+  .legend-table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .cta-row button { flex: 1 1 auto; }
+  .nextstep-online { flex-direction: column; align-items: flex-start; }
+}

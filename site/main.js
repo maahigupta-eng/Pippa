@@ -106,10 +106,9 @@
         const res = await fetch(form.action, { method: "POST", headers: { Accept: "application/json" }, body: data });
         const out = await res.json();
         if (!res.ok || !out.success) throw new Error(out.message || "Something went wrong.");
-        form.querySelectorAll("input:not([type=hidden]), textarea, fieldset, .row2, button").forEach((el) => (el.hidden = true));
-        form.querySelectorAll("label").forEach((el) => (el.hidden = true));
-        note.className = "form-note ok";
-        note.textContent = "Thank you. Your request is in, and we'll reply by email.";
+        const first = String(data.get("name") || "").trim().split(/\s+/)[0];
+        form.classList.add("sent");
+        form.innerHTML = `<div class="sent-box" role="status"><span class="sent-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><h2>Thank you${first ? ", " + first.replace(/[<>&"]/g, "") : ""}.</h2><p>Your request is in. We'll review your case and reply by email, usually within a week.</p><a class="tlink" href="/how">While you wait, see how Pippa works</a></div>`;
       } catch (err) {
         btn.disabled = false; btn.textContent = "Send request";
         note.className = "form-note err";
